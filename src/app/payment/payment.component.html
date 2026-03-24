@@ -1,0 +1,139 @@
+<div class="pay-page">
+
+  @if (success()) {
+    <div class="success-screen">
+      <div class="success-icon">🎉</div>
+      <h2>Payment Successful!</h2>
+      <p>Welcome to PathlyAI <strong>{{ planDetails[plan]?.name }}</strong>. Your account is now active.</p>
+      <p class="redirect-note">Redirecting you to analyze your results...</p>
+      <div class="success-spinner"></div>
+    </div>
+  } @else {
+    <div class="pay-grid">
+
+      <!-- Left: Order Summary -->
+      <div class="order-summary">
+        <a routerLink="/register" [queryParams]="{plan}" class="back-link">← Back</a>
+        <div class="summary-logo">🎓 PathlyAI</div>
+        <h2>Order Summary</h2>
+
+        <div class="summary-plan">
+          <div class="summary-plan-header">
+            <span class="summary-plan-name">{{ planDetails[plan]?.name }} Plan</span>
+            <span class="summary-plan-price">{{ planDetails[plan]?.price }}<span class="per-mo">/mo</span></span>
+          </div>
+          <ul class="summary-features">
+            @for (f of planDetails[plan]?.features; track f) {
+              <li>✓ {{ f }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="summary-total">
+          <span>Total today</span>
+          <span class="total-amount">{{ planDetails[plan]?.price }}</span>
+        </div>
+        <p class="summary-note">🔒 Billed monthly · Cancel anytime · No hidden fees</p>
+
+        @if (pending) {
+          <div class="summary-user">
+            <span class="user-icon">👤</span>
+            <div>
+              <p class="user-name">{{ pending.fullName }}</p>
+              <p class="user-email">{{ pending.email }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Right: Payment Form -->
+      <div class="pay-form-wrap">
+        <h2>Payment Details</h2>
+        <p class="pay-sub">Your payment is secured with 256-bit SSL encryption 🔒</p>
+
+        <!-- Card preview -->
+        <div class="card-preview">
+          <div class="card-brand">{{ cardBrand }}</div>
+          <div class="card-number-preview">
+            {{ card.number || '•••• •••• •••• ••••' }}
+          </div>
+          <div class="card-bottom">
+            <div>
+              <p class="card-label">Card Holder</p>
+              <p class="card-value">{{ card.name || 'YOUR NAME' }}</p>
+            </div>
+            <div>
+              <p class="card-label">Expires</p>
+              <p class="card-value">{{ card.expiry || 'MM/YY' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <form (ngSubmit)="submit()" class="pay-form">
+
+          <div class="field">
+            <label>Name on Card</label>
+            <input type="text" [(ngModel)]="card.name" name="cardName" placeholder="e.g. Thabo Mokoena" autocomplete="cc-name" />
+          </div>
+
+          <div class="field">
+            <label>Card Number</label>
+            <input
+              type="text"
+              [value]="card.number"
+              (input)="formatCardNumber($event)"
+              name="cardNumber"
+              placeholder="1234 5678 9012 3456"
+              maxlength="19"
+              autocomplete="cc-number" />
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Expiry Date</label>
+              <input
+                type="text"
+                [value]="card.expiry"
+                (input)="formatExpiry($event)"
+                name="expiry"
+                placeholder="MM/YY"
+                maxlength="5"
+                autocomplete="cc-exp" />
+            </div>
+            <div class="field">
+              <label>CVV</label>
+              <input
+                type="password"
+                [(ngModel)]="card.cvv"
+                name="cvv"
+                placeholder="•••"
+                maxlength="4"
+                autocomplete="cc-csc" />
+            </div>
+          </div>
+
+          @if (error()) {
+            <div class="error-box">⚠️ {{ error() }}</div>
+          }
+
+          <button type="submit" class="pay-btn" [disabled]="loading()">
+            @if (loading()) {
+              <span class="btn-spinner"></span> Processing...
+            } @else {
+              🔒 Pay {{ planDetails[plan]?.price }} & Activate
+            }
+          </button>
+
+        </form>
+
+        <div class="trust-badges">
+          <span>🔒 SSL Secure</span>
+          <span>✅ Cancel Anytime</span>
+          <span>🇿🇦 ZAR Billing</span>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

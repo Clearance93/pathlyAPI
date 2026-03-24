@@ -1,0 +1,172 @@
+<div class="page">
+
+  <!-- Hero -->
+  <div class="upgrade-hero">
+    <div class="hero-glow"></div>
+    <a routerLink="/analyze" class="back-link">← Back</a>
+    <div class="hero-badge">🔓 Unlock Your Full Potential</div>
+    <h1>You're one step away from<br /><span class="gradient-text">your dream career.</span></h1>
+    <p class="hero-sub">
+      Your free analysis gave you a glimpse. Upgrade to Pro and get the full picture —
+      detailed feedback, all career matches, and the roadmap to get there.
+    </p>
+  </div>
+
+  <!-- Free vs Pro comparison -->
+  <div class="compare-section">
+    <div class="compare-grid">
+
+      <!-- Free -->
+      <div class="compare-card free-card">
+        <div class="compare-header">
+          <span class="compare-plan-name">Free</span>
+          <span class="compare-price">R0 <span class="compare-period">/ forever</span></span>
+          <p class="compare-desc">A taste of what PathlyAI can do.</p>
+        </div>
+        <ul class="feature-list">
+          @for (f of freeFeatures; track f.text) {
+            <li [class.excluded]="!f.included">
+              <span class="feat-icon">{{ f.included ? '✓' : '✗' }}</span>
+              {{ f.text }}
+            </li>
+          }
+        </ul>
+        <div class="compare-cta current-plan">Your current plan</div>
+      </div>
+
+      <!-- Pro / School toggle -->
+      <div class="compare-card pro-card">
+        <div class="plan-toggle">
+          @for (plan of plans; track plan.id) {
+            <button
+              class="toggle-btn"
+              [class.active]="selected() === plan.id"
+              (click)="selected.set(plan.id)">
+              {{ plan.name }}
+            </button>
+          }
+        </div>
+
+        @for (plan of plans; track plan.id) {
+          @if (selected() === plan.id) {
+            <div class="compare-header">
+              <span class="plan-badge-tag">{{ plan.badge }}</span>
+              <span class="compare-plan-name pro-name">{{ plan.name }}</span>
+              <span class="compare-price">{{ plan.price }} <span class="compare-period">/ {{ plan.period }}</span></span>
+              <p class="compare-desc">{{ plan.description }}</p>
+            </div>
+            <ul class="feature-list">
+              @for (f of plan.features; track f.text) {
+                <li>
+                  <span class="feat-icon included">✓</span>
+                  {{ f.text }}
+                </li>
+              }
+            </ul>
+            <a [routerLink]="['/register']" [queryParams]="{plan: plan.id}" class="compare-cta upgrade-btn">
+              Get {{ plan.name }} — {{ plan.price }}/mo →
+            </a>
+            <p class="cta-note">Cancel anytime · No hidden fees</p>
+          }
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <!-- What you're missing -->
+  <div class="missing-section">
+    <p class="section-tag">What You're Missing</p>
+    <h2>Your free report only told <span class="gradient-text">half the story.</span></h2>
+    <div class="missing-grid">
+      <div class="missing-card">
+        <div class="missing-icon">📝</div>
+        <h4>Full AI Feedback</h4>
+        <p>A personalised paragraph explaining your academic profile, what it means, and where it can take you.</p>
+        <div class="locked-preview">
+          <p class="blurred-text">John Doe demonstrates a strong academic performance, particularly in numerical subjects like Mathematics and Accounting...</p>
+          <div class="locked-overlay">🔒 Upgrade to read your feedback</div>
+        </div>
+      </div>
+      <div class="missing-card">
+        <div class="missing-icon">💪</div>
+        <h4>Strengths & Weaknesses</h4>
+        <p>Know exactly where you excel and where to focus your energy before choosing a career path.</p>
+        <div class="sw-preview">
+          <div class="sw-bar green-bar"><span>Strengths</span><div class="bar-fill green-fill" style="width:85%"></div></div>
+          <div class="sw-bar red-bar"><span>Weaknesses</span><div class="bar-fill red-fill" style="width:45%"></div></div>
+          <div class="locked-overlay">🔒 Upgrade to see yours</div>
+        </div>
+      </div>
+      <div class="missing-card">
+        <div class="missing-icon">🔄</div>
+        <h4>Alternative Career Paths</h4>
+        <p>5 additional careers you may not have considered — but that perfectly match your profile.</p>
+        <div class="alt-preview">
+          @for (i of [1,2,3]; track i) {
+            <div class="alt-item">
+              <span class="alt-num">{{ i }}</span>
+              <span class="blurred-text">Alternative career option {{ i }}</span>
+              <span>🔒</span>
+            </div>
+          }
+          <div class="locked-overlay">🔒 Upgrade to unlock</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social proof -->
+  <div class="proof-section">
+    <p class="section-tag">Why Students Upgrade</p>
+    <h2>Don't take our word for it.</h2>
+    <div class="proof-grid">
+      <div class="proof-card">
+        <div class="stars">★★★★★</div>
+        <p>"The full feedback report changed everything. I finally understood why I struggled in certain subjects and what careers would actually suit me."</p>
+        <div class="proof-author"><span class="proof-avatar">TM</span><div><strong>Thabo M.</strong><span>Grade 12 · Johannesburg</span></div></div>
+      </div>
+      <div class="proof-card">
+        <div class="stars">★★★★★</div>
+        <p>"I upgraded to Pro and the alternative careers section showed me options I never even knew existed. Worth every cent."</p>
+        <div class="proof-author"><span class="proof-avatar">LK</span><div><strong>Lerato K.</strong><span>Grade 11 · Pretoria</span></div></div>
+      </div>
+      <div class="proof-card">
+        <div class="stars">★★★★★</div>
+        <p>"The strengths breakdown helped me convince my parents that engineering was the right path for me. The data spoke for itself."</p>
+        <div class="proof-author"><span class="proof-avatar">SN</span><div><strong>Sipho N.</strong><span>Grade 12 · Durban</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <p class="section-tag">FAQ</p>
+    <h2>Got questions? We've got answers.</h2>
+    <div class="faq-list">
+      @for (faq of faqs; track faq.q; let i = $index) {
+        <div class="faq-item" [class.open]="openFaq() === i" (click)="toggleFaq(i)">
+          <div class="faq-question">
+            <span>{{ faq.q }}</span>
+            <span class="faq-chevron">{{ openFaq() === i ? '▲' : '▼' }}</span>
+          </div>
+          @if (openFaq() === i) {
+            <p class="faq-answer">{{ faq.a }}</p>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Final CTA -->
+  <div class="final-cta">
+    <div class="cta-glow"></div>
+    <h2>Your future is worth <span class="gradient-text">R99.</span></h2>
+    <p>Less than a takeaway meal. More than a lifetime of direction.</p>
+    <a [routerLink]="['/register']" [queryParams]="{plan: 'pro'}" class="upgrade-btn-large">
+      Upgrade to Pro Now →
+    </a>
+    <p class="cta-note">Cancel anytime · No hidden fees · Instant access</p>
+  </div>
+
+</div>

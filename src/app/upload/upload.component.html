@@ -1,0 +1,488 @@
+<div class="page">
+  <div class="card upload-card">
+    <a routerLink="/" class="back-link">← Back to Home</a>
+
+    <div class="plan-bar">
+      <span class="plan-badge" [class.pro]="isPro" [class.school]="isSchool">
+        {{ isSchool ? '🏫 School Plan' : isPro ? '⚡ Pro Plan' : '🆓 Free Plan' }}
+      </span>
+      @if (isFree) {
+        <span class="usage-note">{{ sub.analysesLeft() }} analysis remaining</span>
+      }
+    </div>
+
+    <div class="logo">🎓</div>
+    <h1>Analyze My Results</h1>
+    <p class="subtitle">Upload your academic results and let AI map out your future</p>
+
+    @if (!sub.canAnalyze()) {
+      <div class="upgrade-wall">
+        <div class="lock-icon">🔒</div>
+        <h3>You've used your free analysis</h3>
+        <p>Upgrade to Pro to unlock unlimited analyses, full career feedback, strengths & weaknesses, and more.</p>
+        <a [routerLink]="['/register']" [queryParams]="{plan: 'pro'}" class="btn-upgrade">Upgrade to Pro — R99/month →</a>
+      </div>
+    } @else {
+      <label class="file-label" [class.has-file]="fileName()">
+        <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)" />
+        <span class="file-icon">📄</span>
+        <span>{{ fileName() || 'Click to upload your results' }}</span>
+      </label>
+    }
+
+    @if (loading()) {
+      <div class="loader">
+        <div class="spinner"></div>
+        <p>Analyzing your results...</p>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="error-box">⚠️ {{ error() }}</div>
+    }
+
+    @if (result(); as r) {
+      @if (!auth.isLoggedIn()) {
+        <div class="auth-wall">
+          <div class="auth-wall-icon">🎓</div>
+          <h2>Your results are ready!</h2>
+          <p>Sign in or create a free account to view your personalized career analysis.</p>
+          <div class="auth-wall-actions">
+            <a [routerLink]="['/register']" [queryParams]="{plan: 'free'}" class="btn-primary">Create Free Account</a>
+            <a [routerLink]="['/login']" [queryParams]="{returnUrl: '/analyze'}" class="btn-secondary">Log In</a>
+          </div>
+          <p class="auth-wall-note">🔒 Your results are saved — they’ll appear the moment you sign in.</p>
+        </div>
+      } @else {
+      <div class="results">
+
+        <!-- HEADER -->
+        <div class="result-header">
+          <div>
+            <h2>{{ r.userFullName }}</h2>
+            @if (r.grade) { <span class="grade-tag">{{ r.grade }}</span> }
+          </div>
+          <span class="result-plan-tag" [class.pro]="isPro" [class.school]="isSchool">
+            {{ isSchool ? '🏫 School Report' : isPro ? '⚡ Full Report' : '🆓 Free Preview' }}
+          </span>
+        </div>
+
+        <!-- SCORE + PERSONALITY -->
+        <div class="score-row">
+          <div class="score-card">
+            <p class="score-label">Overall Score</p>
+            @if (isFree) {
+              <p class="score-value blurred-score">??%</p>
+              <p class="score-hint">🔒 Upgrade to see your score</p>
+            } @else {
+              <p class="score-value">{{ r.overallScore }}%</p>
+              <div class="score-bar">
+                <div class="score-fill" [style.width.%]="r.overallScore"></div>
+              </div>
+              @if (r.salaryRange) {
+                <p class="salary-range">💰 Expected: {{ r.salaryRange }}</p>
+              }
+            }
+          </div>
+          <div class="personality-card">
+            <p class="score-label">Academic Personality</p>
+            @if (isFree) {
+              <p class="personality-title">{{ r.academicPersonality }}</p>
+              <p class="personality-desc blurred-text-soft">Upgrade to unlock your full personality breakdown and what it means for your future.</p>
+            } @else {
+              <p class="personality-title">{{ r.academicPersonality }}</p>
+              <p class="personality-desc">{{ r.personalityDescription }}</p>
+            }
+          </div>
+        </div>
+
+        <!-- SUMMARY (hidden for free) -->
+        @if (!isFree && r.summary) {
+          <div class="feedback-box">
+            <p class="section-label">📋 Summary</p>
+            <p>{{ r.summary }}</p>
+          </div>
+        }
+
+        <!-- AI FEEDBACK (hidden for free) -->
+        @if (!isFree && r.feedBack) {
+          <div class="feedback-box">
+            <p class="section-label">🤖 AI Feedback</p>
+            <p>{{ r.feedBack }}</p>
+          </div>
+        }
+
+        <!-- MOTIVATIONAL MESSAGE -->
+        @if (r.motivationalMessage) {
+          <div class="motivational-box">
+            <p>💬 "{{ r.motivationalMessage }}"</p>
+          </div>
+        }
+
+        <!-- STRENGTHS & WEAKNESSES (hidden for free) -->
+        @if (!isFree) {
+          <div class="strengths-grid">
+            <div class="strength-card green">
+              <h4>💪 Strengths</h4>
+              <p>{{ r.userStrength }}</p>
+            </div>
+            <div class="strength-card red">
+              <h4>📈 Areas to Improve</h4>
+              <p>{{ r.userWeaknesses }}</p>
+            </div>
+          </div>
+        } @else {
+          <div class="strengths-grid">
+            <div class="strength-card green locked-card">
+              <h4>💪 Strengths 🔒</h4>
+              <p class="blurred-text-soft">Your key academic strengths are hidden. Upgrade to discover what you're naturally good at.</p>
+            </div>
+            <div class="strength-card red locked-card">
+              <h4>📈 Areas to Improve 🔒</h4>
+              <p class="blurred-text-soft">Upgrade to see exactly where to focus your energy for maximum improvement.</p>
+            </div>
+          </div>
+        }
+
+        <!-- SUBJECT RESULTS -->
+        @if (visibleSubjects.length > 0) {
+          <div class="section-block">
+            <h3 class="section-title">📚 Subject Results</h3>
+            <div class="subjects-grid">
+              @for (s of visibleSubjects; track s.subject) {
+                <div class="subject-card">
+                  <div class="subject-top">
+                    <span class="subject-name">{{ s.subject }}</span>
+                    <span class="subject-grade" [class]="s.grade.toLowerCase()">{{ s.grade }}</span>
+                  </div>
+                  <div class="subject-mark-row">
+                    <div class="subject-bar">
+                      <div class="subject-fill" [style.width.%]="s.mark"></div>
+                    </div>
+                    <span class="subject-pct">{{ s.mark }}%</span>
+                  </div>
+                  <p class="subject-relevance">🎯 {{ s.careerRelevance }}</p>
+                  <p class="subject-tip">💡 {{ s.improvementTip }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- TOP CAREER MATCHES -->
+        @if (visibleBestCareers.length > 0) {
+          <div class="section-block">
+            <div class="careers-header">
+              <h3 class="section-title">🏆 Top Career Matches</h3>
+              @if (isFree) { <span class="limited-tag">1 of 5 shown</span> }
+            </div>
+
+            @if (!isFree) {
+              <div class="match-matrix">
+                @for (c of visibleBestCareers; track c.title; let i = $index) {
+                  <div class="matrix-row">
+                    <span class="matrix-label">{{ i + 1 }}. {{ c.title }}</span>
+                    <div class="matrix-bar-wrap">
+                      <div class="matrix-bar" [style.width.%]="c.matchPercentage"
+                           [class]="c.matchPercentage >= 85 ? 'bar-high' : c.matchPercentage >= 70 ? 'bar-med' : 'bar-low'">
+                      </div>
+                    </div>
+                    <span class="matrix-pct">{{ c.matchPercentage }}%</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="career-cards">
+              @for (c of visibleBestCareers; track c.title; let i = $index) {
+                <div class="career-card">
+                  <div class="career-card-top">
+                    <div class="career-rank">{{ i + 1 }}</div>
+                    <div class="career-info">
+                      <p class="career-title">{{ c.title }}</p>
+                      <p class="career-field">{{ c.field }}</p>
+                    </div>
+                    <div class="match-pct" [class]="c.matchPercentage >= 85 ? 'high' : 'medium'">
+                      {{ c.matchPercentage }}% match
+                    </div>
+                  </div>
+                  <div class="career-match-bar-wrap">
+                    <div class="career-match-bar"
+                         [style.width.%]="c.matchPercentage"
+                         [class]="c.matchPercentage >= 85 ? 'bar-high' : c.matchPercentage >= 70 ? 'bar-med' : 'bar-low'">
+                    </div>
+                  </div>
+                  <p class="career-reason">{{ c.reason }}</p>
+                  @if (!isFree) {
+                    <p class="career-desc">{{ c.jobDescription }}</p>
+                    <div class="career-meta">
+                      <span>📖 {{ c.universityCourse }}</span>
+                      <span>📚 {{ c.requiredSubjects }}</span>
+                      <span>⏱ {{ c.timeToQualify }}</span>
+                      <span>💰 {{ c.salaryRange }}</span>
+                      <span>📈 {{ c.growthPotential }} growth</span>
+                    </div>
+                    <div class="career-companies">
+                      @for (co of c.topCompaniesHiring; track co) {
+                        <span class="company-tag">{{ co }}</span>
+                      }
+                    </div>
+                  } @else {
+                    <p class="free-career-hint">🔒 Upgrade to see salary range, required subjects, university courses, top hiring companies and more.</p>
+                  }
+                </div>
+              }
+
+              <!-- Locked career cards for free users -->
+              @if (lockedBestCareers.length > 0) {
+                @for (c of lockedBestCareers; track c.title; let i = $index) {
+                  <div class="career-card locked-career-card">
+                    <div class="career-card-top">
+                      <div class="career-rank locked-rank">{{ i + 2 }}</div>
+                      <div class="career-info">
+                        <p class="career-title blurred-text-soft">Career Match #{{ i + 2 }}</p>
+                        <p class="career-field blurred-text-soft">Unlock to reveal</p>
+                      </div>
+                      <div class="match-pct locked-pct">🔒 Hidden</div>
+                    </div>
+                    <div class="locked-career-body">
+                      <span class="lock-big">🔒</span>
+                      <p>4 more career matches are waiting for you</p>
+                      <p class="locked-sub">Including salary ranges, university courses, required subjects & top companies hiring</p>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ALTERNATIVE CAREERS -->
+        @if (visibleAltCareers.length > 0) {
+          <div class="section-block">
+            <h3 class="section-title">🔄 Alternative Career Paths</h3>
+            <div class="match-matrix alt-matrix">
+              @for (c of visibleAltCareers; track c.title; let i = $index) {
+                <div class="matrix-row">
+                  <span class="matrix-label">{{ i + 1 }}. {{ c.title }}</span>
+                  <div class="matrix-bar-wrap">
+                    <div class="matrix-bar bar-alt" [style.width.%]="c.matchPercentage"></div>
+                  </div>
+                  <span class="matrix-pct">{{ c.matchPercentage }}%</span>
+                </div>
+              }
+            </div>
+            <div class="career-cards">
+              @for (c of visibleAltCareers; track c.title; let i = $index) {
+                <div class="career-card alt">
+                  <div class="career-card-top">
+                    <div class="career-rank alt-rank">{{ i + 1 }}</div>
+                    <div class="career-info">
+                      <p class="career-title">{{ c.title }}</p>
+                      <p class="career-field">{{ c.field }}</p>
+                    </div>
+                    <div class="match-pct medium">{{ c.matchPercentage }}% match</div>
+                  </div>
+                  <div class="career-match-bar-wrap">
+                    <div class="career-match-bar bar-alt" [style.width.%]="c.matchPercentage"></div>
+                  </div>
+                  <p class="career-reason">{{ c.reason }}</p>
+                  <p class="career-desc">{{ c.jobDescription }}</p>
+                  <div class="career-meta">
+                    <span>📖 {{ c.universityCourse }}</span>
+                    <span>📚 {{ c.requiredSubjects }}</span>
+                    <span>⏱ {{ c.timeToQualify }}</span>
+                    <span>💰 {{ c.salaryRange }}</span>
+                    <span>📈 {{ c.growthPotential }} growth</span>
+                  </div>
+                  <div class="career-companies">
+                    @for (co of c.topCompaniesHiring; track co) {
+                      <span class="company-tag">{{ co }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- HIGH-DEMAND CAREERS -->
+        @if (visibleDemandingJobs.length > 0) {
+          <div class="section-block">
+            <h3 class="section-title">🔥 High-Demand Careers</h3>
+            @for (d of visibleDemandingJobs; track d.careerTitle) {
+              <div class="demand-card">
+                <div class="demand-header">
+                  <span class="demand-title">{{ d.careerTitle }}</span>
+                  <span class="demand-level">{{ d.globalDemandLevel }}</span>
+                </div>
+                <p class="demand-why">{{ d.whyItIsInDemand }}</p>
+                <div class="demand-meta">
+                  <span>💰 {{ d.salaryRange }}</span>
+                  <span class="qualify-badge" [class.yes]="d.canStudentQualify">
+                    {{ d.canStudentQualify ? '✅ Can Qualify' : '⚠️ Needs Work' }}
+                  </span>
+                  <span>🎯 {{ d.chancesIfTheyOpt }}% chance</span>
+                </div>
+                <p class="demand-verdict">{{ d.qualificationVerdict }}</p>
+                <p class="demand-verdict">{{ d.reasonForVerdict }}</p>
+                <p class="demand-needs">🛠 {{ d.whatTheyNeedToSucceed }}</p>
+                <p class="demand-honesty">💬 {{ d.honestyMessage }}</p>
+                @if (d.subjectsTheyAreMissing.length) {
+                  <div class="missing-subjects">
+                    <span class="missing-label">Missing subjects:</span>
+                    @for (s of d.subjectsTheyAreMissing; track s) {
+                      <span class="missing-tag">{{ s }}</span>
+                    }
+                  </div>
+                }
+                <p class="demand-alt">🔀 {{ d.alternativeRoute }}</p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- DYING CAREERS -->
+        @if (visibleDyingCareers.length > 0) {
+          <div class="section-block">
+            <h3 class="section-title">⚠️ Careers to Avoid</h3>
+            @for (d of visibleDyingCareers; track d.careerTitle) {
+              <div class="dying-card">
+                <div class="dying-header">
+                  <span class="dying-title">{{ d.careerTitle }}</span>
+                  <span class="dying-pct">{{ d.jobAvailabilityIn5Years }}% jobs left in 5 yrs</span>
+                </div>
+                <p class="dying-why">{{ d.whyItIsDying }}</p>
+                <p class="dying-warning">⚠️ {{ d.honestWarning }}</p>
+                <p class="dying-redirect">💡 {{ d.motivationalRedirect }}</p>
+                <p class="dying-alt">✅ Better alternative: <strong>{{ d.betterAlternative }}</strong></p>
+                <p class="dying-chance">Job chance after studying: {{ d.chanceOfGettingJobAfterStudying }}%</p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- EMPLOYMENT OUTLOOK -->
+        @if (visibleOutlook.length > 0) {
+          <div class="section-block">
+            <h3 class="section-title">📊 Employment Outlook</h3>
+            @for (o of visibleOutlook; track o.careerTitle) {
+              <div class="outlook-card">
+                <div class="outlook-header">
+                  <span class="outlook-title">{{ o.careerTitle }}</span>
+                  <span class="outlook-chance">{{ o.chanceOfEmploymentAfterGraduation }}% employment chance</span>
+                </div>
+                <p class="outlook-summary">{{ o.outlookSummary }}</p>
+                <div class="outlook-meta">
+                  <span>⏱ First job: {{ o.averageTimeToGetFirstJob }}</span>
+                  <span>🏁 Competition: {{ o.jobMarketCompetition }}</span>
+                  <span>💼 Entry: {{ o.entryLevelSalary }}</span>
+                  <span>🚀 Senior: {{ o.seniorLevelSalary }}</span>
+                </div>
+                @if (o.topIndustriesHiring.length) {
+                  <div class="career-companies">
+                    @for (ind of o.topIndustriesHiring; track ind) {
+                      <span class="company-tag">{{ ind }}</span>
+                    }
+                  </div>
+                }
+                <p class="outlook-sa">🇿🇦 {{ o.southAfricanMarketInsight }}</p>
+                <p class="outlook-global">🌍 {{ o.globalOpportunities }}</p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- EXTRAS GRID -->
+        <div class="extras-grid">
+          @if (r.universitiesToConsider.length) {
+            <div class="extra-card">
+              <h4>🏛 Universities to Consider</h4>
+              <ul>
+                @for (u of r.universitiesToConsider; track u) { <li>{{ u }}</li> }
+              </ul>
+            </div>
+          }
+          @if (r.bursariesAvailable.length) {
+            <div class="extra-card">
+              <h4>💰 Bursaries Available</h4>
+              <ul>
+                @for (b of r.bursariesAvailable; track b) { <li>{{ b }}</li> }
+              </ul>
+            </div>
+          }
+          @if (r.skillsToLearn.length) {
+            <div class="extra-card">
+              <h4>🛠 Skills to Learn</h4>
+              <div class="tags-wrap">
+                @for (s of r.skillsToLearn; track s) { <span class="skill-tag">{{ s }}</span> }
+              </div>
+            </div>
+          }
+          @if (r.subjectChangeSuggestions.length) {
+            <div class="extra-card">
+              <h4>📝 Subject Suggestions</h4>
+              <ul>
+                @for (s of r.subjectChangeSuggestions; track s) { <li>{{ s }}</li> }
+              </ul>
+            </div>
+          }
+        </div>
+
+        @if (r.studyTips) {
+          <div class="feedback-box">
+            <p class="section-label">📖 Study Tips</p>
+            <p>{{ r.studyTips }}</p>
+          </div>
+        }
+
+        @if (r.improvementRoadmap) {
+          <div class="feedback-box">
+            <p class="section-label">🗺 Improvement Roadmap</p>
+            <p>{{ r.improvementRoadmap }}</p>
+          </div>
+        }
+
+        @if (r.fiveYearOutlook) {
+          <div class="feedback-box">
+            <p class="section-label">🔭 5-Year Outlook</p>
+            <p>{{ r.fiveYearOutlook }}</p>
+          </div>
+        }
+
+        @if (r.riskAssessment) {
+          <div class="feedback-box">
+            <p class="section-label">⚖️ Risk Assessment</p>
+            <p>{{ r.riskAssessment }}</p>
+          </div>
+        }
+
+        @if (r.teacherRecommendation) {
+          <div class="feedback-box school-box">
+            <p class="section-label">👩‍🏫 Teacher Recommendation</p>
+            <p>{{ r.teacherRecommendation }}</p>
+          </div>
+        }
+
+        @if (r.parentSummary) {
+          <div class="feedback-box school-box">
+            <p class="section-label">👨‍👩‍👧 Parent Summary</p>
+            <p>{{ r.parentSummary }}</p>
+          </div>
+        }
+
+        @if (isFree) {
+          <div class="upgrade-cta">
+            <div class="upgrade-cta-text">
+              <strong>🔓 You've only seen 1 of 5 career matches</strong>
+              <p>Unlock your full score, AI feedback, subject breakdown, strengths & weaknesses, salary ranges, universities, bursaries and 4 more career matches.</p>
+            </div>
+            <a [routerLink]="['/register']" [queryParams]="{plan: 'pro'}" class="btn-upgrade">Unlock Full Report →</a>
+          </div>
+        }
+
+      </div>
+      } <!-- end logged in -->
+    }
+  </div>
+</div>

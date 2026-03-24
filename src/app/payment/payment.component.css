@@ -1,0 +1,226 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.pay-page {
+  min-height: 100vh;
+  background: #0a081e;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1.5rem 3rem;
+}
+
+/* ── SUCCESS ── */
+.success-screen {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 420px;
+}
+.success-icon { font-size: 4rem; }
+.success-screen h2 { font-size: 1.75rem; font-weight: 800; }
+.success-screen p { color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6; }
+.redirect-note { font-size: 0.82rem; color: rgba(255,255,255,0.35); }
+.success-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid rgba(167,139,250,0.3);
+  border-top-color: #a78bfa;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-top: 0.5rem;
+}
+
+/* ── GRID ── */
+.pay-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 0;
+  width: 100%;
+  max-width: 900px;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── ORDER SUMMARY ── */
+.order-summary {
+  background: rgba(167,139,250,0.07);
+  border-right: 1px solid rgba(255,255,255,0.07);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.back-link {
+  display: inline-block;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.back-link:hover { color: #fff; }
+
+.summary-logo {
+  font-size: 1rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.order-summary h2 { font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,0.85); }
+
+.summary-plan {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.summary-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1rem;
+}
+
+.summary-plan-name { font-weight: 700; font-size: 0.95rem; }
+.summary-plan-price { font-size: 1.4rem; font-weight: 900; }
+.per-mo { font-size: 0.75rem; font-weight: 400; color: rgba(255,255,255,0.4); }
+
+.summary-features { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
+.summary-features li { font-size: 0.82rem; color: rgba(255,255,255,0.6); }
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.6);
+}
+.total-amount { font-size: 1.25rem; font-weight: 800; color: #fff; }
+
+.summary-note { font-size: 0.75rem; color: rgba(255,255,255,0.35); line-height: 1.5; }
+
+.summary-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255,255,255,0.04);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-top: auto;
+}
+.user-icon { font-size: 1.25rem; }
+.user-name { font-size: 0.88rem; font-weight: 600; }
+.user-email { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
+
+/* ── PAYMENT FORM ── */
+.pay-form-wrap {
+  background: rgba(255,255,255,0.03);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.pay-form-wrap h2 { font-size: 1.25rem; font-weight: 800; }
+.pay-sub { font-size: 0.82rem; color: rgba(255,255,255,0.45); }
+
+/* Card preview */
+.card-preview {
+  background: linear-gradient(135deg, #302b63, #a78bfa44);
+  border: 1px solid rgba(167,139,250,0.3);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-family: 'Courier New', monospace;
+}
+
+.card-brand { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.6); }
+.card-number-preview { font-size: 1.1rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.9); }
+.card-bottom { display: flex; justify-content: space-between; }
+.card-label { font-size: 0.65rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+.card-value { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85); text-transform: uppercase; }
+
+/* Form fields */
+.pay-form { display: flex; flex-direction: column; gap: 0.9rem; }
+
+.field { display: flex; flex-direction: column; gap: 0.35rem; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.field label { font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.6); }
+
+.field input {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 0.75rem;
+  padding: 0.7rem 1rem;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.field input::placeholder { color: rgba(255,255,255,0.2); }
+.field input:focus { border-color: rgba(167,139,250,0.6); }
+
+.error-box {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.35);
+  border-radius: 0.75rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.83rem;
+  color: #fca5a5;
+}
+
+.pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 0.25rem;
+}
+.pay-btn:hover:not(:disabled) { opacity: 0.88; }
+.pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.trust-badges {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+}
+
+@media (max-width: 680px) {
+  .pay-grid { grid-template-columns: 1fr; }
+  .order-summary { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); }
+}
