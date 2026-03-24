@@ -18,5 +18,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           app_location: '/'
-          output_location: 'browser'
-          app_build_command: 'npm run build -- --configuration production'
+          output_location: 'dist/pathlyAI/browser'
+          skip_app_build: false
