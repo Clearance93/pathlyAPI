@@ -487,14 +487,24 @@
 .footer-copy { font-size: 0.8rem; color: rgba(255,255,255,0.3); }
 
 @media (max-width: 768px) {
-  .hero { flex-direction: column; text-align: center; padding-top: 6rem; }
-  .hero-actions { justify-content: center; }
-  .mock-card { width: 100%; max-width: 340px; }
-  .stat { padding: 0.5rem 1.5rem; }
+  .hero { flex-direction: column; text-align: center; padding: 5rem 1.25rem 3rem; gap: 2rem; }
+  .hero-actions { justify-content: center; flex-direction: column; align-items: center; }
+  .btn-primary, .btn-ghost { width: 100%; text-align: center; }
+  .mock-card { width: 100%; max-width: 100%; }
+  .stat { padding: 0.5rem 1rem; }
   .stat-divider { display: none; }
+  .stats { gap: 0.5rem; }
+  .section { padding: 4rem 1.25rem; }
+  .steps { grid-template-columns: 1fr; }
+  .plans { grid-template-columns: 1fr; }
   .about-grid { grid-template-columns: 1fr; gap: 2rem; text-align: center; }
   .about-tags { justify-content: center; }
-  .about-img { height: 320px; }
+  .about-img { height: 280px; max-width: 100%; }
+  .carousel-track { max-width: 100%; min-height: 260px; }
+  .carousel-wrap { gap: 0.5rem; }
+  .final-cta { padding: 4rem 1.25rem; }
+  .large-btn { width: 100%; text-align: center; }
+  .hero-note { font-size: 0.72rem; }
 }
 
 /* ── SAMPLE LABEL ── */

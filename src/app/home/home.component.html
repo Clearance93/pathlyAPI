@@ -12,10 +12,10 @@
       born to pursue — in under 30 seconds.
     </p>
     <div class="hero-actions">
-      <a routerLink="/analyze" class="btn-primary">Analyze My Results Free →</a>
+      <a (click)="goToAnalyze()" class="btn-primary" style="cursor:pointer">Analyze My Results Free →</a>
       <a href="#how" class="btn-ghost">See How It Works</a>
     </div>
-    <p class="hero-note">✅ No sign-up required &nbsp;·&nbsp; ✅ 100% Free to start &nbsp;·&nbsp; ✅ Instant results</p>
+    <p class="hero-note">✅ Free to start &nbsp;·&nbsp; ✅ Instant results &nbsp;·&nbsp; ✅ 3 free analyses</p>
   </div>
 
   <div class="hero-card">
@@ -72,7 +72,7 @@
         </div>
       }
     </div>
-    <a routerLink="/analyze" class="btn-primary center-btn">Try It Now — It's Free</a>
+    <a (click)="goToAnalyze()" class="btn-primary center-btn" style="cursor:pointer">Try It Now — It's Free</a>
   </div>
 </section>
 
@@ -129,7 +129,7 @@
               <li>✓ {{ f }}</li>
             }
           </ul>
-          <a [routerLink]="[plan.plan === 'free' ? '/analyze' : '/register']" [queryParams]="plan.plan !== 'free' ? {plan: plan.plan} : {}" class="plan-cta" [class.plan-cta-highlight]="plan.highlight">{{ plan.cta }}</a>
+          <a [routerLink]="[plan.plan === 'free' ? '/register' : '/register']" [queryParams]="{plan: plan.plan}" class="plan-cta" [class.plan-cta-highlight]="plan.highlight">{{ plan.cta }}</a>
         </div>
       }
     </div>
@@ -172,7 +172,7 @@
   <div class="cta-glow"></div>
   <h2>Your dream career is one upload away.</h2>
   <p>Join thousands of students who stopped wondering and started doing.</p>
-  <a routerLink="/analyze" class="btn-primary large-btn">Analyze My Results Now →</a>
+  <a (click)="goToAnalyze()" class="btn-primary large-btn" style="cursor:pointer">Analyze My Results Now →</a>
 </section>
 
 <!-- FOOTER -->

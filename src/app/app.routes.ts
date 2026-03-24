@@ -6,10 +6,11 @@ import { RegisterComponent } from './register/register.component';
 import { PaymentComponent } from './payment/payment.component';
 import { LoginComponent } from './login/login';
 import { AuthCallbackComponent } from './auth-callback/auth-callback';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'analyze', component: UploadComponent },
+  { path: 'analyze', component: UploadComponent, canActivate: [authGuard] },
   { path: 'upgrade', component: UpgradeComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },

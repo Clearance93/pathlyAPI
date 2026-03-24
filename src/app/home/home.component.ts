@@ -1,5 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -8,6 +9,8 @@ import { RouterLink } from '@angular/router';
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  private auth = inject(AuthService);
+  private router = inject(Router);
   carouselIndex = 0;
   private _interval: ReturnType<typeof setInterval> | null = null;
 
@@ -17,6 +20,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this._interval) clearInterval(this._interval);
+  }
+
+  goToAnalyze() {
+    if (this.auth.isLoggedIn()) {
+      this.router.navigate(['/analyze']);
+    } else {
+      this.router.navigate(['/register'], { queryParams: { returnUrl: '/analyze' } });
+    }
   }
 
   nextSlide() {
