@@ -1,17 +1,26 @@
 <nav class="navbar">
-  <a routerLink="/" class="brand">
+  <a routerLink="/" class="brand" (click)="closeMenu()">
     <span class="brand-icon">🎓</span>
     <span class="brand-name">PathlyAI</span>
   </a>
-  <div class="nav-links">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
-    <a routerLink="/upgrade" routerLinkActive="active">Pricing</a>
+
+  <button class="hamburger" (click)="toggleMenu()" [class.open]="menuOpen()">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="nav-links" [class.open]="menuOpen()">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">Home</a>
+    <a routerLink="/upgrade" routerLinkActive="active" (click)="closeMenu()">Pricing</a>
+
     @if (auth.isLoggedIn()) {
-      <span class="nav-user">👤 {{ auth.currentUser()?.email }}</span>
-      <button class="nav-logout" (click)="auth.logout()">Sign Out</button>
+      <div class="nav-user">
+        <div class="nav-avatar">{{ (auth.currentUser()?.email ?? 'U')[0].toUpperCase() }}</div>
+        <span class="nav-email">{{ auth.currentUser()?.email }}</span>
+      </div>
+      <button class="nav-logout" (click)="auth.logout(); closeMenu()">Sign Out</button>
     } @else {
-      <a routerLink="/login" routerLinkActive="active">Sign In</a>
-      <a routerLink="/register" [queryParams]="{plan:'pro'}" class="nav-cta">Get Started Free</a>
+      <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Sign In</a>
+      <a routerLink="/register" [queryParams]="{plan:'pro'}" class="nav-cta" (click)="closeMenu()">Get Started Free</a>
     }
   </div>
 </nav>
