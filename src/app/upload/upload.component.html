@@ -119,6 +119,87 @@
           </div>
         }
 
+        <!-- APS ANALYSIS -->
+        @if (r.apsAnalysis; as aps) {
+          <div class="section-block">
+            <h3 class="section-title">📊 APS Analysis</h3>
+            <div class="aps-score-row">
+              <div class="aps-score-card">
+                <p class="score-label">Calculated APS</p>
+                <p class="aps-score-value">{{ aps.calculatedAPS }}</p>
+                <p class="aps-qualify-badge" [class.qualified]="aps.qualifiesForUniversity">
+                  {{ aps.qualifiesForUniversity ? '✅ Qualifies for University' : '⚠️ Does Not Qualify Yet' }}
+                </p>
+                <p class="aps-qualify-msg">{{ aps.qualificationMessage }}</p>
+              </div>
+            </div>
+
+            @if (aps.universitiesTheyQualifyFor.length) {
+              <div class="aps-uni-section">
+                <p class="section-label">🎓 Universities You Qualify For</p>
+                <div class="aps-uni-grid">
+                  @for (u of aps.universitiesTheyQualifyFor; track u.name) {
+                    <div class="aps-uni-card qualify">
+                      <div class="aps-uni-top">
+                        <span class="aps-uni-name">{{ u.name }}</span>
+                        <span class="aps-uni-status qualify">✅ {{ u.status }}</span>
+                      </div>
+                      <p class="aps-uni-min">Min APS: {{ u.minimumAPS }}</p>
+                      @if (u.recommendedCourses?.length) {
+                        <div class="aps-courses">
+                          @for (c of u.recommendedCourses; track c) {
+                            <span class="aps-course-tag">{{ c }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (aps.universitiesTheyDoNotQualifyFor.length) {
+              <div class="aps-uni-section">
+                <p class="section-label">🔒 Universities You Don't Qualify For Yet</p>
+                <div class="aps-uni-grid">
+                  @for (u of aps.universitiesTheyDoNotQualifyFor; track u.name) {
+                    <div class="aps-uni-card no-qualify">
+                      <div class="aps-uni-top">
+                        <span class="aps-uni-name">{{ u.name }}</span>
+                        <span class="aps-uni-status no-qualify">⚠️ {{ u.status }}</span>
+                      </div>
+                      <p class="aps-uni-min">Min APS: {{ u.minimumAPS }} · Gap: {{ u.gap }} points</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (aps.improvementAdvice; as advice) {
+              <div class="aps-advice-card">
+                <p class="section-label">💡 Improvement Advice</p>
+                <p class="aps-advice-guidance">{{ advice.motivationalGuidance }}</p>
+                @if (advice.recommendedSubjectsToImprove.length) {
+                  <div class="aps-improve-row">
+                    <span class="aps-improve-label">Subjects to improve:</span>
+                    @for (s of advice.recommendedSubjectsToImprove; track s) {
+                      <span class="missing-tag">{{ s }}</span>
+                    }
+                  </div>
+                }
+                @if (advice.alternativeOptions.length) {
+                  <div class="aps-improve-row">
+                    <span class="aps-improve-label">Alternatives:</span>
+                    @for (o of advice.alternativeOptions; track o) {
+                      <span class="skill-tag">{{ o }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
         <!-- STRENGTHS & WEAKNESSES (hidden for free) -->
         @if (!isFree) {
           <div class="strengths-grid">
@@ -395,14 +476,7 @@
 
         <!-- EXTRAS GRID -->
         <div class="extras-grid">
-          @if (r.universitiesToConsider.length) {
-            <div class="extra-card">
-              <h4>🏛 Universities to Consider</h4>
-              <ul>
-                @for (u of r.universitiesToConsider; track u) { <li>{{ u }}</li> }
-              </ul>
-            </div>
-          }
+
           @if (r.bursariesAvailable.length) {
             <div class="extra-card">
               <h4>💰 Bursaries Available</h4>
@@ -436,25 +510,38 @@
           </div>
         }
 
-        @if (r.improvementRoadmap) {
-          <div class="feedback-box">
-            <p class="section-label">🗺 Improvement Roadmap</p>
-            <p>{{ r.improvementRoadmap }}</p>
+        @if (isFree) {
+          <div class="feedback-box locked-card">
+            <p class="section-label">🗺 Improvement Roadmap 🔒</p>
+            <p class="blurred-text-soft">Upgrade to Pro to unlock your personalised improvement roadmap.</p>
           </div>
-        }
-
-        @if (r.fiveYearOutlook) {
-          <div class="feedback-box">
-            <p class="section-label">🔭 5-Year Outlook</p>
-            <p>{{ r.fiveYearOutlook }}</p>
+          <div class="feedback-box locked-card">
+            <p class="section-label">🔭 5-Year Outlook 🔒</p>
+            <p class="blurred-text-soft">Upgrade to Pro to see where your career path leads in 5 years.</p>
           </div>
-        }
-
-        @if (r.riskAssessment) {
-          <div class="feedback-box">
-            <p class="section-label">⚖️ Risk Assessment</p>
-            <p>{{ r.riskAssessment }}</p>
+          <div class="feedback-box locked-card">
+            <p class="section-label">⚖️ Risk Assessment 🔒</p>
+            <p class="blurred-text-soft">Upgrade to Pro to get a full risk assessment for your chosen career path.</p>
           </div>
+        } @else {
+          @if (r.improvementRoadmap) {
+            <div class="feedback-box">
+              <p class="section-label">🗺 Improvement Roadmap</p>
+              <p>{{ r.improvementRoadmap }}</p>
+            </div>
+          }
+          @if (r.fiveYearOutlook) {
+            <div class="feedback-box">
+              <p class="section-label">🔭 5-Year Outlook</p>
+              <p>{{ r.fiveYearOutlook }}</p>
+            </div>
+          }
+          @if (r.riskAssessment) {
+            <div class="feedback-box">
+              <p class="section-label">⚖️ Risk Assessment</p>
+              <p>{{ r.riskAssessment }}</p>
+            </div>
+          }
         }
 
         @if (r.teacherRecommendation) {

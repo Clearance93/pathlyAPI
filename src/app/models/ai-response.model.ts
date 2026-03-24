@@ -1,3 +1,29 @@
+export interface UniversityQualification {
+  name: string;
+  minimumAPS: number;
+  status: string;
+  recommendedCourses?: string[];
+  gap?: number;
+}
+
+export interface ImprovementAdvice {
+  shouldRewriteMatric: boolean;
+  shouldUpgradeSubjects: boolean;
+  recommendedSubjectsToImprove: string[];
+  alternativeOptions: string[];
+  motivationalGuidance: string;
+}
+
+export interface ApsAnalysis {
+  calculatedAPS: number;
+  apsExplanation: string;
+  qualifiesForUniversity: boolean;
+  qualificationMessage: string;
+  universitiesTheyQualifyFor: UniversityQualification[];
+  universitiesTheyDoNotQualifyFor: UniversityQualification[];
+  improvementAdvice: ImprovementAdvice;
+}
+
 export interface SubjectResult {
   subject: string;
   mark: number;
@@ -65,6 +91,7 @@ export interface AiResponse {
   userFullName: string;
   grade: string;
   summary: string;
+  apsAnalysis?: ApsAnalysis;
   overallScore: number;
   academicPersonality: string;
   personalityDescription: string;

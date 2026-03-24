@@ -677,3 +677,96 @@ h1 {
 }
 .btn-secondary:hover { border-color: #a78bfa; color: #fff; }
 .auth-wall-note { font-size: 0.8rem; color: rgba(255,255,255,0.3); margin-top: 0.25rem; }
+
+/* ── APS Analysis ── */
+.aps-score-row { display: flex; gap: 1rem; }
+
+.aps-score-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.aps-score-value {
+  font-size: 3rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+
+.aps-qualify-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  background: rgba(239,68,68,0.12);
+  color: #fca5a5;
+  width: fit-content;
+}
+.aps-qualify-badge.qualified {
+  background: rgba(52,211,153,0.12);
+  color: #6ee7b7;
+}
+
+.aps-qualify-msg {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.5;
+}
+
+.aps-uni-section { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.aps-uni-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 0.6rem; }
+
+.aps-uni-card {
+  border-radius: 0.875rem;
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.aps-uni-card.qualify {
+  background: rgba(52,211,153,0.06);
+  border: 1px solid rgba(52,211,153,0.2);
+}
+.aps-uni-card.no-qualify {
+  background: rgba(239,68,68,0.05);
+  border: 1px solid rgba(239,68,68,0.15);
+}
+
+.aps-uni-top { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.aps-uni-name { font-size: 0.88rem; font-weight: 600; }
+.aps-uni-status { font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 1rem; }
+.aps-uni-status.qualify { background: rgba(52,211,153,0.12); color: #6ee7b7; }
+.aps-uni-status.no-qualify { background: rgba(239,68,68,0.12); color: #fca5a5; }
+.aps-uni-min { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+
+.aps-courses { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.2rem; }
+.aps-course-tag {
+  font-size: 0.72rem; font-weight: 600;
+  background: rgba(167,139,250,0.1);
+  border: 1px solid rgba(167,139,250,0.2);
+  color: #c4b5fd;
+  padding: 0.15rem 0.5rem; border-radius: 1rem;
+}
+
+.aps-advice-card {
+  background: rgba(167,139,250,0.05);
+  border: 1px solid rgba(167,139,250,0.15);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.aps-advice-guidance { font-size: 0.88rem; color: rgba(255,255,255,0.65); line-height: 1.6; }
+.aps-improve-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
+.aps-improve-label { font-size: 0.75rem; color: rgba(255,255,255,0.4); }

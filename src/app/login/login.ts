@@ -19,6 +19,15 @@ export class LoginComponent {
   error   = signal('');
   loading = signal(false);
 
+  constructor() {
+    const err = this.route.snapshot.queryParamMap.get('error');
+    if (err === 'account_creation_failed') {
+      this.error.set('Google sign-in failed. If you already have an account, please sign in with your email and password.');
+    } else if (err) {
+      this.error.set('Social sign-in failed. Please try again or use email and password.');
+    }
+  }
+
   submit() {
     this.error.set('');
     if (!this.form.email || !this.form.password) {
