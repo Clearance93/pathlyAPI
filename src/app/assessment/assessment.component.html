@@ -1,0 +1,292 @@
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════
+       PHASE HEADER (shown during all question phases)
+  ══════════════════════════════════════════════ -->
+  @if (phase() !== 'results') {
+    <div class="shell">
+      <div class="assess-header">
+        <a href="/analyze" class="back-link">← Back to Dashboard</a>
+        <div class="assess-badge">🧠 Career Interest Assessment</div>
+        <h1>Discover your Career Interest Profile</h1>
+        <p class="assess-sub">Answer honestly — there are no right or wrong answers. The more truthful you are, the more accurate your career profile will be.</p>
+        <div class="assess-meta">
+          <span>📋 78 questions total</span>
+          <span>⏱ About 10–12 minutes</span>
+          <span>🔒 Your answers are private</span>
+        </div>
+      </div>
+
+      <!-- Overall progress bar -->
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="overallProgress()"></div>
+        </div>
+        <div class="progress-labels">
+          <span>{{ overallProgress() }}% complete</span>
+          <div class="phase-pills">
+            <span class="phase-pill" [class.active]="phase() === 'rating'" [class.done]="phase() === 'truefalse' || phase() === 'multichoice'">① Rating Scale</span>
+            <span class="phase-pill" [class.active]="phase() === 'truefalse'" [class.done]="phase() === 'multichoice'">② True / False</span>
+            <span class="phase-pill" [class.active]="phase() === 'multichoice'">③ Scenarios</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           PHASE 1 — RATING SCALE
+      ════════════════════════════════════════ -->
+      @if (phase() === 'rating') {
+        @for (group of ratingGroups; track group.key; let gi = $index) {
+          @if (gi === ratingGroup()) {
+            <div class="phase-intro">
+              <span class="phase-tag">Part 1 of 3 — Rating Scale</span>
+              <p class="phase-desc">Rate each statement from <strong>1 (Not at all like me)</strong> to <strong>5 (Very much like me)</strong>.</p>
+            </div>
+
+            <div class="group-header">
+              <span class="group-emoji">{{ group.emoji }}</span>
+              <div>
+                <p class="group-label">Section {{ gi + 1 }} of {{ ratingGroups.length }}</p>
+                <h2 class="group-title">{{ group.label }}</h2>
+              </div>
+            </div>
+
+            <div class="questions-list">
+              @for (q of group.questions; track q.id; let qi = $index) {
+                <div class="question-card" [class.answered]="getRating(q.id) > 0">
+                  <p class="q-text"><span class="q-num">{{ qi + 1 }}.</span> {{ q.text }}</p>
+                  <div class="scale-wrap">
+                    <span class="scale-edge">Not like me</span>
+                    <div class="scale-btns">
+                      @for (score of [1,2,3,4,5]; track score) {
+                        <button class="scale-btn" [class.selected]="getRating(q.id) === score"
+                                (click)="setRating(q.id, score)" [title]="scaleLabels[score-1]">
+                          {{ score }}
+                        </button>
+                      }
+                    </div>
+                    <span class="scale-edge">Very like me</span>
+                  </div>
+                  @if (getRating(q.id) > 0) {
+                    <p class="answer-hint">{{ scaleLabels[getRating(q.id) - 1] }}</p>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="nav-row">
+              @if (ratingGroup() > 0) {
+                <button class="btn-ghost" (click)="prevRatingGroup()">← Previous</button>
+              } @else { <span></span> }
+              <button class="btn-primary" [disabled]="!currentRatingGroupAnswered()" (click)="nextRatingGroup()">
+                {{ ratingGroup() === ratingGroups.length - 1 ? 'Continue to True / False →' : 'Next Section →' }}
+              </button>
+            </div>
+            @if (!currentRatingGroupAnswered()) {
+              <p class="nav-hint">Please answer all questions in this section to continue.</p>
+            }
+          }
+        }
+      }
+
+      <!-- ════════════════════════════════════════
+           PHASE 2 — TRUE / FALSE
+      ════════════════════════════════════════ -->
+      @if (phase() === 'truefalse') {
+        @for (group of tfGroups; track group.key; let gi = $index) {
+          @if (gi === tfGroup()) {
+            <div class="phase-intro">
+              <span class="phase-tag">Part 2 of 3 — True or False</span>
+              <p class="phase-desc">Read each statement and select whether it is <strong>True</strong> or <strong>False</strong> for you.</p>
+            </div>
+
+            <div class="group-header">
+              <span class="group-emoji">{{ group.emoji }}</span>
+              <div>
+                <p class="group-label">Section {{ gi + 1 }} of {{ tfGroups.length }}</p>
+                <h2 class="group-title">{{ group.label }}</h2>
+              </div>
+            </div>
+
+            <div class="questions-list">
+              @for (q of group.questions; track q.id; let qi = $index) {
+                <div class="question-card tf-card" [class.answered]="getTf(q.id) !== null">
+                  <p class="q-text"><span class="q-num">{{ qi + 1 }}.</span> {{ q.text }}</p>
+                  <div class="tf-btns">
+                    <button class="tf-btn true-btn" [class.selected]="getTf(q.id) === true" (click)="setTf(q.id, true)">
+                      ✓ True
+                    </button>
+                    <button class="tf-btn false-btn" [class.selected]="getTf(q.id) === false" (click)="setTf(q.id, false)">
+                      ✗ False
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="nav-row">
+              <button class="btn-ghost" (click)="prevTfGroup()">← Previous</button>
+              <button class="btn-primary" [disabled]="!currentTfGroupAnswered()" (click)="nextTfGroup()">
+                {{ tfGroup() === tfGroups.length - 1 ? 'Continue to Scenarios →' : 'Next Section →' }}
+              </button>
+            </div>
+            @if (!currentTfGroupAnswered()) {
+              <p class="nav-hint">Please answer all questions in this section to continue.</p>
+            }
+          }
+        }
+      }
+
+      <!-- ════════════════════════════════════════
+           PHASE 3 — MULTIPLE CHOICE SCENARIOS
+      ════════════════════════════════════════ -->
+      @if (phase() === 'multichoice') {
+        <div class="phase-intro">
+          <span class="phase-tag">Part 3 of 3 — Real-World Scenarios</span>
+          <p class="phase-desc">For each situation below, choose the option that <strong>best describes what you would actually do</strong>. Pick the one that feels most natural — not what you think is the "right" answer.</p>
+        </div>
+
+        <div class="questions-list">
+          @for (q of mcQuestions; track q.id; let qi = $index) {
+            <div class="question-card mc-card" [class.answered]="getMc(q.id) !== null">
+              <p class="q-text"><span class="q-num">{{ qi + 1 }}.</span> {{ q.text }}</p>
+              <div class="mc-options">
+                @for (opt of q.options; track opt.label) {
+                  <button class="mc-option" [class.selected]="getMc(q.id) === opt.type"
+                          (click)="setMc(q.id, opt.type)">
+                    <span class="mc-emoji">{{ getTypeEmoji(opt.type) }}</span>
+                    <span class="mc-label">{{ opt.label }}</span>
+                    @if (getMc(q.id) === opt.type) {
+                      <span class="mc-check">✓</span>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-ghost" (click)="prevMc()">← Previous</button>
+          <button class="btn-primary" [disabled]="!allMcAnswered()" (click)="submitAssessment()">
+            See My Career Interest Profile →
+          </button>
+        </div>
+        @if (!allMcAnswered()) {
+          <p class="nav-hint">Please answer all scenario questions to see your results.</p>
+        }
+      }
+
+    </div>
+  }
+
+  <!-- ══════════════════════════════════════════════
+       RESULTS PAGE
+  ══════════════════════════════════════════════ -->
+  @if (phase() === 'results') {
+    @if (result(); as r) {
+      <div class="shell">
+
+        <div class="results-header">
+          <div class="results-badge">🎯 Career Interest Profile Complete</div>
+          <h1>Your Career Interest Profile</h1>
+          <p class="results-sub">Based on {{ 78 }} questions across three assessment types, here is a comprehensive picture of your career interests and personality.</p>
+        </div>
+
+        <!-- Top 3 types -->
+        <div class="top-types">
+          @for (key of r.topTypes; track key; let i = $index) {
+            <div class="top-type-card" [style.border-color]="getTypeColor(key)">
+              <div class="top-type-rank" [style.background]="getTypeColor(key)">#{{ i + 1 }}</div>
+              <div class="top-type-emoji">{{ getTypeEmoji(key) }}</div>
+              <p class="top-type-label" [style.color]="getTypeColor(key)">{{ getTypeLabel(key) }}</p>
+              <p class="top-type-score">{{ getScore(r.scores, key) }}%</p>
+              <p class="top-type-desc">{{ getTypeDesc(key) }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Full profile bars -->
+        <div class="profile-section">
+          <h3>Full Interest Profile</h3>
+          <p class="profile-note">Scores are weighted across all three question types — rating scale, true/false and real-world scenarios.</p>
+          <div class="profile-bars">
+            @for (key of sortedTypes(); track key) {
+              <div class="profile-bar-row">
+                <div class="profile-bar-label">
+                  <span class="pb-emoji">{{ getTypeEmoji(key) }}</span>
+                  <span class="pb-name">{{ getTypeLabel(key) }}</span>
+                </div>
+                <div class="profile-bar-track">
+                  <div class="profile-bar-fill" [style.width.%]="getScore(r.scores, key)" [style.background]="getTypeColor(key)"></div>
+                </div>
+                <span class="pb-pct">{{ getScore(r.scores, key) }}%</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Strength summary -->
+        <div class="strength-summary-box">
+          <p class="ss-label">📊 Assessment Summary</p>
+          <p class="ss-text">{{ r.strengthSummary }}</p>
+        </div>
+
+        <!-- Conclusion -->
+        <div class="conclusion-box">
+          <p class="conclusion-label">🤖 Pathly's Conclusion</p>
+          <p class="conclusion-text">{{ r.conclusion }}</p>
+        </div>
+
+        <!-- Career suggestions -->
+        <div class="careers-section">
+          <h3>Careers that may suit your profile</h3>
+          <p class="careers-note">These suggestions are based on your top two interest types. When combined with your academic results, Pathly can refine these further.</p>
+          <div class="career-tags">
+            @for (c of r.careerSuggestions; track c) {
+              <span class="career-tag">{{ c }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Type breakdown cards -->
+        <div class="type-breakdown">
+          <h3>What each of your top types means</h3>
+          <div class="type-cards">
+            @for (key of r.topTypes; track key) {
+              <div class="type-card" [style.border-color]="getTypeColor(key) + '55'">
+                <div class="type-card-head" [style.background]="getTypeColor(key) + '18'">
+                  <span class="type-card-emoji">{{ getTypeEmoji(key) }}</span>
+                  <span class="type-card-name" [style.color]="getTypeColor(key)">{{ getTypeLabel(key) }}</span>
+                  <span class="type-card-score" [style.color]="getTypeColor(key)">{{ getScore(r.scores, key) }}%</span>
+                </div>
+                <p class="type-card-desc">{{ getTypeDesc(key) }}</p>
+                <div class="type-card-careers">
+                  @for (c of getTypeCareers(key); track c) {
+                    <span class="mini-career-tag">{{ c }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Combine with academic -->
+        <div class="combine-box">
+          <div class="combine-icon">🎓</div>
+          <div>
+            <p class="combine-title">Your profile has been saved</p>
+            <p class="combine-desc">Return to your career analysis to see how this Career Interest Profile combines with your academic results. Together, they give Pathly a much deeper understanding of which careers may truly fit you.</p>
+          </div>
+        </div>
+
+        <div class="results-actions">
+          <button class="btn-primary" (click)="goToDashboard()">← Back to My Career Analysis</button>
+          <button class="btn-ghost" (click)="retake()">Retake Assessment</button>
+        </div>
+
+      </div>
+    }
+  }
+
+</div>

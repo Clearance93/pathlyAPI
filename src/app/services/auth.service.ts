@@ -11,7 +11,7 @@ export interface AuthUser {
   plan: 'free' | 'pro' | 'school';
 }
 
-const BASE = 'https://pathly.azurewebsites.net/api/Auth';
+const BASE = 'https://localhost:7135/api/Authentication';
 const AUTH_KEY = 'pathly_auth';
 
 @Injectable({ providedIn: 'root' })
@@ -27,7 +27,7 @@ export class AuthService {
   isPro      = computed(() => this.plan() === 'pro' || this.plan() === 'school');
 
   register(firstName: string, lastName: string, email: string, password: string, plan: string) {
-    return this.http.post<AuthUser>(`${BASE}/accountCreation`, {
+    return this.http.post<AuthUser>(`${BASE}/registration`, {
       firstName, lastName, email, password
     }).pipe(
       tap(user => {
