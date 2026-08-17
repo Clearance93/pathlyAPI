@@ -9,19 +9,19 @@ export interface UniversityQualification {
 export interface ImprovementAdvice {
   shouldRewriteMatric: boolean;
   shouldUpgradeSubjects: boolean;
-  recommendedSubjectsToImprove: string[];
-  alternativeOptions: string[];
+  recommendedSubjectsToImprove: string[] | null;
+  alternativeOptions: string[] | null;
   motivationalGuidance: string;
 }
 
 export interface ApsAnalysis {
-  calculatedAPS: number;
+  calculatedAPS: number | null;
   apsExplanation: string;
   qualifiesForUniversity: boolean;
   qualificationMessage: string;
-  universitiesTheyQualifyFor: UniversityQualification[];
-  universitiesTheyDoNotQualifyFor: UniversityQualification[];
-  improvementAdvice: ImprovementAdvice;
+  universitiesTheyQualifyFor: UniversityQualification[] | null;
+  universitiesTheyDoNotQualifyFor: UniversityQualification[] | null;
+  improvementAdvice?: ImprovementAdvice;
 }
 
 export interface SubjectResult {
@@ -43,7 +43,7 @@ export interface CareerMatch {
   growthPotential: string;
   salaryRange: string;
   timeToQualify: string;
-  topCompaniesHiring: string[];
+  topCompaniesHiring: string[] | null;
 }
 
 export interface DemandingCareerAssessment {
@@ -57,7 +57,7 @@ export interface DemandingCareerAssessment {
   chancesIfTheyOpt: number;
   whatTheyNeedToSucceed: string;
   honestyMessage: string;
-  subjectsTheyAreMissing: string[];
+  subjectsTheyAreMissing: string[] | null;
   alternativeRoute: string;
 }
 
@@ -80,14 +80,24 @@ export interface EmploymentOutlook {
   jobMarketCompetition: string;
   southAfricanMarketInsight: string;
   globalOpportunities: string;
-  topIndustriesHiring: string[];
+  topIndustriesHiring: string[] | null;
   entryLevelSalary: string;
   seniorLevelSalary: string;
   outlookSummary: string;
 }
 
+export interface PsychometricScores {
+  realistic: number;
+  investigative: number;
+  artistic: number;
+  social: number;
+  enterprising: number;
+  conventional: number;
+}
+
 export interface AiResponse {
   aiReponseId: string;
+  extractionAcademicRecordId?: string | null;
   userFullName: string;
   grade: string;
   summary: string;
@@ -105,16 +115,16 @@ export interface AiResponse {
   topDemandingJobs: DemandingCareerAssessment[];
   dyingCareers: DyingCareerWarning[];
   employmentOutlookAfterGraduation: EmploymentOutlook[];
-  universitiesToConsider: string[];
-  bursariesAvailable: string[];
+  universitiesToConsider: string[] | null;
+  bursariesAvailable: string[] | null;
   studyTips: string;
   improvementRoadmap: string;
-  skillsToLearn: string[];
+  skillsToLearn: string[] | null;
   fiveYearOutlook: string;
   salaryRange: string;
   riskAssessment: string;
   teacherRecommendation: string;
   parentSummary: string;
-  subjectChangeSuggestions: string[];
+  subjectChangeSuggestions: string[] | null;
   timeStamp: string;
 }

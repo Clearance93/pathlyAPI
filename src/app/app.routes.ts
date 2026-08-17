@@ -6,14 +6,16 @@ import { RegisterComponent } from './register/register.component';
 import { PaymentComponent } from './payment/payment.component';
 import { LoginComponent } from './login/login';
 import { AuthCallbackComponent } from './auth-callback/auth-callback';
+import { AssessmentComponent } from './assessment/assessment.component';
 import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'analyze', component: UploadComponent, canActivate: [authGuard] },
-  { path: 'upgrade', component: UpgradeComponent },
+  { path: 'assessment', component: AssessmentComponent, canActivate: [authGuard] },
+  { path: 'upgrade', component: UpgradeComponent, canActivate: [authGuard] },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'auth-callback', component: AuthCallbackComponent },
-  { path: 'payment', component: PaymentComponent }
+  { path: 'payment', component: PaymentComponent, canActivate: [authGuard] }
 ];

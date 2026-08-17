@@ -2,44 +2,102 @@
 <section class="hero">
   <div class="hero-glow"></div>
   <div class="hero-content">
-    <div class="hero-badge">🚀 AI-Powered Career Guidance</div>
+    <div class="hero-badge">🧠 AI Career Intelligence Platform</div>
     <h1>
-      Stop Guessing.<br />
-      <span class="gradient-text">Start Knowing.</span>
+      Your marks tell a story.<br />
+      <span class="gradient-text">Pathly helps you read it.</span>
     </h1>
     <p class="hero-sub">
-      Upload your academic results and let our AI reveal the careers you were
-      born to pursue — in under 30 seconds.
+      Upload your academic results and Pathly builds a personalized career intelligence
+      report — combining your subjects, APS, and AI reasoning to show you exactly
+      where you can go and how to get there.
     </p>
     <div class="hero-actions">
-      <a (click)="goToAnalyze()" class="btn-primary" style="cursor:pointer">Analyze My Results Free →</a>
+      <a (click)="goToAnalyze()" class="btn-primary" style="cursor:pointer">Discover My Career Path →</a>
       <a href="#how" class="btn-ghost">See How It Works</a>
     </div>
-    <p class="hero-note">✅ Free to start &nbsp;·&nbsp; ✅ Instant results &nbsp;·&nbsp; ✅ 3 free analyses</p>
+    <p class="hero-note">✅ Free to start &nbsp;·&nbsp; ✅ No career counsellor needed &nbsp;·&nbsp; ✅ Results in under 60 seconds</p>
   </div>
 
   <div class="hero-card">
     <div class="mock-card">
-      <div class="sample-label">📋 Sample Result</div>
+      <div class="sample-label">📋 Sample Intelligence Report</div>
       <div class="mock-header">
-        <span class="mock-avatar">JD</span>
+        <span class="mock-avatar">TM</span>
         <div>
-          <p class="mock-name">John Doe</p>
-          <p class="mock-sub">Grade 12 · Matric Results</p>
+          <p class="mock-name">Thabo Mokoena</p>
+          <p class="mock-sub">Grade 12 · Matric Results · APS 38</p>
         </div>
         <span class="mock-badge">✓ Analyzed</span>
       </div>
       <div class="mock-section">
-        <p class="mock-label">💪 Top Strength</p>
-        <p class="mock-value">Mathematics & Accounting (85% · 90%)</p>
+        <p class="mock-label">📚 Academic Profile</p>
+        <div class="mock-subjects">
+          <span class="mock-subject">Mathematics <strong>85%</strong></span>
+          <span class="mock-subject">Physical Sciences <strong>81%</strong></span>
+          <span class="mock-subject">Life Sciences <strong>76%</strong></span>
+        </div>
       </div>
       <div class="mock-section">
-        <p class="mock-label">🏆 Best Career Match</p>
+        <p class="mock-label">🏆 Top Career Matches</p>
         <ul class="mock-list">
-          <li><span class="rank">1</span> Actuary</li>
-          <li><span class="rank">2</span> Financial Analyst</li>
-          <li><span class="rank">3</span> Data Analyst</li>
+          <li><span class="rank">1</span> Biomedical Engineer <span class="mock-match">92%</span></li>
+          <li><span class="rank">2</span> Data Scientist <span class="mock-match">88%</span></li>
+          <li><span class="rank">3</span> Mechanical Engineer <span class="mock-match">85%</span></li>
         </ul>
+      </div>
+      <div class="mock-reasoning">
+        <span class="reasoning-label">🤖 AI Reasoning</span>
+        <p>"Mathematics 85% and Physical Sciences 81% indicate a strong foundation for engineering and science pathways."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTELLIGENCE LAYERS -->
+<section class="layers-section">
+  <div class="section-inner">
+    <p class="section-tag">How Pathly Thinks</p>
+    <h2>Two layers of intelligence.<br /><span class="gradient-text">One clear direction.</span></h2>
+    <p class="section-sub">
+      Most tools just calculate your APS. Pathly goes further — combining what your marks say
+      about your academic readiness with what your interests say about your fit.
+    </p>
+    <div class="layers-grid">
+      <div class="layer-card layer-1">
+        <div class="layer-num">Layer 1</div>
+        <div class="layer-icon">📊</div>
+        <h3>Academic Intelligence</h3>
+        <p>Pathly reads your exact marks, calculates your APS, and matches your academic profile to career requirements.</p>
+        <ul class="layer-list">
+          <li>✓ Exact subject marks</li>
+          <li>✓ APS calculation</li>
+          <li>✓ Subject-to-career alignment</li>
+          <li>✓ University qualification check</li>
+          <li>✓ Career demand analysis</li>
+        </ul>
+        <div class="layer-tag available">Available Now</div>
+      </div>
+      <div class="layer-plus">+</div>
+      <div class="layer-card layer-2">
+        <div class="layer-num">Layer 2</div>
+        <div class="layer-icon">🧠</div>
+        <h3>Career Interest Intelligence</h3>
+        <p>A short psychometric assessment adds your interests, working style and motivations to deepen your recommendations.</p>
+        <ul class="layer-list">
+          <li>✓ Career interest profile</li>
+          <li>✓ Working environment fit</li>
+          <li>✓ Motivation alignment</li>
+          <li>✓ Deeper career matching</li>
+          <li>✓ Combined AI reasoning</li>
+        </ul>
+        <div class="layer-tag coming-soon">Coming Soon</div>
+      </div>
+      <div class="layer-equals">=</div>
+      <div class="layer-result">
+        <div class="layer-result-icon">🎯</div>
+        <h3>Deeper Career Intelligence</h3>
+        <p>When both layers combine, Pathly can tell you not just what you're academically prepared for — but what may truly fit you.</p>
       </div>
     </div>
   </div>
@@ -49,7 +107,7 @@
 <section class="stats">
   <div class="stat"><span class="stat-num">10,000+</span><span class="stat-label">Students Guided</span></div>
   <div class="stat-divider"></div>
-  <div class="stat"><span class="stat-num">30s</span><span class="stat-label">Average Analysis Time</span></div>
+  <div class="stat"><span class="stat-num">60s</span><span class="stat-label">Average Analysis Time</span></div>
   <div class="stat-divider"></div>
   <div class="stat"><span class="stat-num">95%</span><span class="stat-label">Satisfaction Rate</span></div>
   <div class="stat-divider"></div>
@@ -59,29 +117,83 @@
 <!-- HOW IT WORKS -->
 <section class="section" id="how">
   <div class="section-inner">
-    <p class="section-tag">How It Works</p>
-    <h2>Three steps to your future</h2>
-    <p class="section-sub">No career counsellor appointments. No waiting weeks. Just upload and discover.</p>
-    <div class="steps">
-      @for (step of steps; track step.title; let i = $index) {
-        <div class="step-card">
-          <div class="step-num">{{ i + 1 }}</div>
-          <div class="step-icon">{{ step.icon }}</div>
-          <h3>{{ step.title }}</h3>
-          <p>{{ step.desc }}</p>
+    <p class="section-tag">The Journey</p>
+    <h2>From results to roadmap</h2>
+    <p class="section-sub">Pathly walks you through a structured career intelligence process — not just a score.</p>
+    <div class="journey-steps">
+      <div class="journey-step">
+        <div class="journey-icon">📄</div>
+        <div class="journey-content">
+          <h3>Upload Your Results</h3>
+          <p>Upload your matric or academic report card. Pathly reads your subjects and exact marks.</p>
         </div>
-      }
+      </div>
+      <div class="journey-arrow">↓</div>
+      <div class="journey-step">
+        <div class="journey-icon">📊</div>
+        <div class="journey-content">
+          <h3>Academic Profile Built</h3>
+          <p>Pathly extracts your subjects, exact marks, and calculates your APS automatically.</p>
+        </div>
+      </div>
+      <div class="journey-arrow">↓</div>
+      <div class="journey-step">
+        <div class="journey-icon">🤖</div>
+        <div class="journey-content">
+          <h3>AI Career Analysis</h3>
+          <p>Our AI matches your academic profile to careers, explains why each fits, and shows you the pathway to get there.</p>
+        </div>
+      </div>
+      <div class="journey-arrow">↓</div>
+      <div class="journey-step">
+        <div class="journey-icon">🎯</div>
+        <div class="journey-content">
+          <h3>Personalized Career Report</h3>
+          <p>Receive your full career intelligence report — top matches, demand analysis, university options, and your roadmap.</p>
+        </div>
+      </div>
     </div>
-    <a (click)="goToAnalyze()" class="btn-primary center-btn" style="cursor:pointer">Try It Now — It's Free</a>
+    <a (click)="goToAnalyze()" class="btn-primary center-btn" style="cursor:pointer">Start My Career Analysis →</a>
+  </div>
+</section>
+
+<!-- WHAT PATHLY IS NOT -->
+<section class="section dark-section">
+  <div class="section-inner">
+    <p class="section-tag">The Pathly Difference</p>
+    <h2>This is not an APS calculator.</h2>
+    <div class="diff-grid">
+      <div class="diff-card bad">
+        <div class="diff-label">❌ Basic Tools</div>
+        <ul>
+          <li>Calculate your APS</li>
+          <li>Show a generic career list</li>
+          <li>No reasoning or explanation</li>
+          <li>No demand or growth data</li>
+          <li>No pathway guidance</li>
+        </ul>
+      </div>
+      <div class="diff-card good">
+        <div class="diff-label">✅ Pathly Career Intelligence</div>
+        <ul>
+          <li>Reads your exact marks per subject</li>
+          <li>Calculates APS and university fit</li>
+          <li>Matches careers to your academic profile</li>
+          <li>Explains <em>why</em> each career fits using your actual marks</li>
+          <li>Shows career demand, growth and salary data</li>
+          <li>Identifies careers to avoid and why</li>
+          <li>Gives you a step-by-step career pathway</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section class="section dark-section">
+<section class="section">
   <div class="section-inner">
     <p class="section-tag">Real Students. Real Results.</p>
     <h2>They found their path. You can too.</h2>
-    <p class="section-sub">Don't take our word for it.</p>
     <div class="carousel-wrap">
       <button class="carousel-btn" (click)="prevSlide()">&#8592;</button>
       <div class="carousel-track">
@@ -109,33 +221,6 @@
   </div>
 </section>
 
-<!-- PRICING -->
-<section class="section" id="pricing">
-  <div class="section-inner">
-    <p class="section-tag">Pricing</p>
-    <h2>Invest in your future today</h2>
-    <p class="section-sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
-    <div class="plans">
-      @for (plan of plans; track plan.name) {
-        <div class="plan-card" [class.highlighted]="plan.highlight">
-          @if (plan.highlight) { <div class="popular-badge">Most Popular</div> }
-          <h3 class="plan-name">{{ plan.name }}</h3>
-          <div class="plan-price">
-            <span class="price-amount">{{ plan.price }}</span>
-            <span class="price-period">/ {{ plan.period }}</span>
-          </div>
-          <ul class="plan-features">
-            @for (f of plan.features; track f) {
-              <li>✓ {{ f }}</li>
-            }
-          </ul>
-          <a [routerLink]="[plan.plan === 'free' ? '/register' : '/register']" [queryParams]="{plan: plan.plan}" class="plan-cta" [class.plan-cta-highlight]="plan.highlight">{{ plan.cta }}</a>
-        </div>
-      }
-    </div>
-  </div>
-</section>
-
 <!-- ABOUT -->
 <section class="section about-section" id="about">
   <div class="section-inner">
@@ -158,7 +243,7 @@
           direction. Because your grades already tell a story. We just help you read it.
         </p>
         <div class="about-tags">
-          <span>🎯 Career Clarity</span>
+          <span>🎯 Career Intelligence</span>
           <span>🤖 AI-Powered</span>
           <span>🇿🇦 Made in South Africa</span>
         </div>
@@ -170,9 +255,13 @@
 <!-- FINAL CTA -->
 <section class="final-cta">
   <div class="cta-glow"></div>
-  <h2>Your dream career is one upload away.</h2>
-  <p>Join thousands of students who stopped wondering and started doing.</p>
-  <a (click)="goToAnalyze()" class="btn-primary large-btn" style="cursor:pointer">Analyze My Results Now →</a>
+  <div class="cta-principle">
+    <p>"Your marks tell us what you may be academically prepared for."</p>
+    <p>"Your interests help us understand what may fit you."</p>
+    <p class="cta-principle-highlight">"Together, they give Pathly a deeper understanding of your potential career pathways."</p>
+  </div>
+  <a (click)="goToAnalyze()" class="btn-primary large-btn" style="cursor:pointer">Start My Career Analysis — Free →</a>
+  <p class="cta-note">No credit card · No career counsellor · Results in under 60 seconds</p>
 </section>
 
 <!-- FOOTER -->
