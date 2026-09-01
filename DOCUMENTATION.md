@@ -9,7 +9,7 @@ The app provides:
 - AI analysis of matric results and grades
 - suggested careers and university matches
 - tiered subscription plans with free, Pro, and School access
-- authentication via email/password and social login
+- authentication via email/password with JWT tokens
 
 ## 2. Purpose
 
@@ -50,8 +50,7 @@ Plans shown in the UI:
 Users can:
 - register with email and password
 - sign in with email/password
-- sign in via Google or Microsoft
-- maintain session data in localStorage
+- maintain session data (JWT) in localStorage
 - access the upload/analyze page only when authenticated
 
 ## 4. User Journey
@@ -95,10 +94,10 @@ Upload and analysis page. Protected by `authGuard`.
 Registration page with plan selection.
 
 ### 5.4 `/login`
-Login page with email/password and social login options.
+Login page with email/password authentication.
 
 ### 5.5 `/auth-callback`
-Handles redirects from social login providers.
+Reserved landing point for OAuth redirect flows (no providers wired up yet).
 
 ### 5.6 `/payment`
 Payment and plan activation page.
@@ -149,9 +148,17 @@ The AI response model is defined in `src/app/models/ai-response.model.ts` and in
 
 ### 7.4 Backend integration
 
-The frontend calls the backend at:
-- `https://pathly.azurewebsites.net/api/Auth` for authentication
-- `https://pathly.azurewebsites.net/api/AI/academicRecord` for academic analysis
+The API base URL is configured per environment in `src/environments/`:
+- `environment.ts` — production default (relative `/api` paths, same-origin/reverse-proxy friendly)
+- `environment.development.ts` — local development (`https://localhost:7135`)
+
+The main endpoints called are:
+- `/api/Authentication/registration` and `/api/Authentication/login`
+- `/api/AcademicAnalysis/analysis`, `/api/AcademicAnalysis/analysis/premium` and `/api/AcademicAnalysis/psychometric-analysis`
+- `/api/Psychometric/assessment`
+
+An HTTP interceptor (`src/app/interceptors/auth.interceptor.ts`) attaches the stored JWT as a
+Bearer token to every API request.
 
 ## 8. Implementation Details
 

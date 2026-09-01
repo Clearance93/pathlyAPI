@@ -1,5 +1,8 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { PsychometricService } from '../services/psychometric.service';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 export type RiasecKey = 'R' | 'I' | 'A' | 'S' | 'E' | 'C';
@@ -229,6 +232,11 @@ type Phase = 'rating' | 'truefalse' | 'multichoice' | 'results';
 })
 export class AssessmentComponent {
 
+  constructor(
+    private auth: AuthService,
+    private psychometricApi: PsychometricService,
+  ) {}
+
   readonly ratingGroups = [
     { key: 'R' as RiasecKey, label: 'Realistic — The Doer',         emoji: '🔧', questions: RATING_QUESTIONS.filter(q => q.type === 'R') },
     { key: 'I' as RiasecKey, label: 'Investigative — The Thinker',  emoji: '🔬', questions: RATING_QUESTIONS.filter(q => q.type === 'I') },
@@ -250,14 +258,18 @@ export class AssessmentComponent {
   readonly mcQuestions = MC_QUESTIONS;
   readonly typeMeta    = TYPE_META;
   readonly scaleLabels = ['Not at all like me', 'Slightly like me', 'Somewhat like me', 'Mostly like me', 'Very much like me'];
+  readonly totalQuestions = RATING_QUESTIONS.length + TF_QUESTIONS.length + MC_QUESTIONS.length;
 
   // State
+  private router = inject(Router);
+
   phase          = signal<Phase>('rating');
   ratingGroup    = signal(0);
   tfGroup        = signal(0);
   ratingAnswers  = signal<Record<number, number>>({});   // 1–5
   tfAnswers      = signal<Record<number, boolean | null>>({});  // true/false/null
   mcAnswers      = signal<Record<number, RiasecKey>>({});
+  storeError     = signal(false);
 
   // ── Progress ──────────────────────────────────────────────────────────────
   overallProgress = computed(() => {
@@ -388,7 +400,49 @@ export class AssessmentComponent {
     return (Object.keys(r.scores) as RiasecKey[]).sort((a, b) => r.scores[b] - r.scores[a]);
   });
 
-  submitAssessment() { this.phase.set('results'); scrollTo(0, 0); }
+  submitAssessment() {
+    this.phase.set('results');
+    scrollTo(0, 0);
+    this.persistResults();
+  }
+
+  /** Persists the answered questions + scores against the logged-in user's account. */
+  private persistResults() {
+    const user = this.auth.currentUser();
+    const assessmentResult = this.result();
+
+    if (!user?.id) {
+      this.storeError.set(true);
+      return;
+    }
+    if (!assessmentResult) return;
+
+    // The API expects full RIASEC names — map the UI's single-letter keys across.
+    const scores = assessmentResult.scores;
+    const profile = {
+      realistic: scores.R,
+      investigative: scores.I,
+      artistic: scores.A,
+      social: scores.S,
+      enterprising: scores.E,
+      conventional: scores.C,
+    };
+
+    const trueFalseAnswers: Record<string, boolean> = {};
+    for (const [id, answer] of Object.entries(this.tfAnswers())) {
+      if (answer !== null && answer !== undefined) trueFalseAnswers[id] = answer;
+    }
+
+    this.psychometricApi.submitAssessment({
+      userId: user.id,
+      ratingAnswers: { ...this.ratingAnswers() },
+      trueFalseAnswers,
+      multipleChoiceAnswers: { ...this.mcAnswers() },
+      profile,
+    }).subscribe({
+      error: () => this.storeError.set(true),
+    });
+  }
 
   retake() {
     this.ratingAnswers.set({});
@@ -401,7 +455,7 @@ export class AssessmentComponent {
     scrollTo(0, 0);
   }
 
-  goToDashboard() { window.location.href = '/analyze'; }
+  goToDashboard() { this.router.navigate(['/analyze']); }
 
   getScore(scores: RiasecResult, key: string): number { return scores[key as RiasecKey] ?? 0; }
   getTypeColor(key: string): string  { return TYPE_META[key]?.color ?? '#a78bfa'; }

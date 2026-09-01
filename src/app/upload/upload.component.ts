@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AcademicService } from '../services/academic.service';
 import { SubscriptionService } from '../services/subscription.service';
-import { AuthService } from '../services/auth.service';
+import { BillingService } from '../services/billing.service';
 import { AiResponse, CareerMatch, DemandingCareerAssessment, DyingCareerWarning, EmploymentOutlook, SubjectResult } from '../models/ai-response.model';
 
 @Component({
@@ -15,7 +15,7 @@ import { AiResponse, CareerMatch, DemandingCareerAssessment, DyingCareerWarning,
 export class UploadComponent {
   private service = inject(AcademicService);
   sub = inject(SubscriptionService);
-  auth = inject(AuthService);
+  private billing = inject(BillingService);
 
   private readonly RESULT_KEY = 'pathly_pending_result';
 
@@ -40,10 +40,6 @@ export class UploadComponent {
   ];
 
   private stepInterval: ReturnType<typeof setInterval> | null = null;
-
-  get isFree()   { return false; }
-  get isPro()    { return true; }
-  get isSchool() { return false; }
 
   get visibleBestCareers(): CareerMatch[]                  { return this.result()?.topFiveBestCareers ?? []; }
   get visibleAltCareers(): CareerMatch[]                   { return this.result()?.topFiveAlternativeCareer ?? []; }
@@ -145,14 +141,21 @@ export class UploadComponent {
         sessionStorage.setItem(this.RESULT_KEY, JSON.stringify(res));
         this.loading.set(false);
         this.sub.recordUsage();
-        this.sub.recordIp();
+        this.refreshUsage();
       },
       error: (err) => {
         this.stopLoadingSteps();
-        if (err.status === 413) {
+        if (err.status === 402) {
+          const detail = err.error?.message;
+          this.error.set(detail
+            ? `${detail} Visit the plans page to upgrade.`
+            : "You've used all your free analyses for this month. Upgrade to keep going.");
+        } else if (err.status === 413) {
           this.error.set("We couldn't read your file — it's too large. Please use a smaller or compressed image.");
         } else if (err.status === 429) {
           this.error.set("Our AI is currently busy. Please wait a moment and try again.");
+        } else if (err.status === 401) {
+          this.error.set("Your session has expired. Please log in again to continue.");
         } else if (err.status === 0) {
           this.error.set("We couldn't connect to the analysis service. Please check your connection and try again.");
         } else {
@@ -160,6 +163,18 @@ export class UploadComponent {
         }
         this.loading.set(false);
       }
+    });
+  }
+
+  /** Pulls authoritative month-to-date usage from the billing engine. */
+  private refreshUsage(): void {
+    this.billing.getUsage().subscribe({
+      next: summary => {
+        if (summary.planCode !== 'free') {
+          this.sub.resetUsage();
+        }
+      },
+      error: () => { /* offline-tolerant: local counter stays as-is */ }
     });
   }
 

@@ -5,7 +5,8 @@
   background: #0a081e;
   color: #fff;
   font-family: 'Inter', -apple-system, sans-serif;
-  padding: 5rem 1rem 4rem;
+  /* 7rem clears the fixed navbar, which grows taller when the signed-in user chip shows */
+  padding: 7rem 1rem 4rem;
   display: flex;
   justify-content: center;
 }
@@ -515,4 +516,9 @@ h1 {
   .results-actions { flex-direction: column; }
   .profile-bar-label { min-width: 110px; }
   .phase-pills { display: none; }
+}
+
+.store-warning {
+  color: #dc2626;
+  font-weight: 500;
 }

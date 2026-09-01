@@ -17,5 +17,6 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'auth-callback', component: AuthCallbackComponent },
-  { path: 'payment', component: PaymentComponent, canActivate: [authGuard] }
+  { path: 'payment', component: PaymentComponent, canActivate: [authGuard] },
+  { path: '**', redirectTo: '' }
 ];

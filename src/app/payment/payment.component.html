@@ -34,97 +34,43 @@
           <span class="total-amount">{{ planDetails[plan]?.price }}</span>
         </div>
         <p class="summary-note">🔒 Billed monthly · Cancel anytime · No hidden fees</p>
-
-        @if (pending) {
-          <div class="summary-user">
-            <span class="user-icon">👤</span>
-            <div>
-              <p class="user-name">{{ pending.fullName }}</p>
-              <p class="user-email">{{ pending.email }}</p>
-            </div>
-          </div>
-        }
       </div>
 
-      <!-- Right: Payment Form -->
+      <!-- Right: Secure checkout -->
       <div class="pay-form-wrap">
-        <h2>Payment Details</h2>
-        <p class="pay-sub">Your payment is secured with 256-bit SSL encryption 🔒</p>
+        <h2>Secure Checkout</h2>
+        <p class="pay-sub">You'll complete payment on our secure payment provider's page — we never see or store your card details.</p>
 
-        <!-- Card preview -->
-        <div class="card-preview">
-          <div class="card-brand">{{ cardBrand }}</div>
-          <div class="card-number-preview">
-            {{ card.number || '•••• •••• •••• ••••' }}
+        @if (paymentsUnavailable()) {
+          <div class="coming-soon-box">
+            <p class="cs-icon">🚀</p>
+            <h3>Payments launching soon</h3>
+            <p>We're putting the finishing touches on online checkout. You currently have <strong>full free access</strong> — enjoy everything while we finish.</p>
+            <button type="button" class="pay-btn" (click)="goBack()">← Back to analyzing</button>
           </div>
-          <div class="card-bottom">
-            <div>
-              <p class="card-label">Card Holder</p>
-              <p class="card-value">{{ card.name || 'YOUR NAME' }}</p>
+        } @else {
+          <form (ngSubmit)="submit()" class="pay-form">
+
+            <div class="checkout-summary-row">
+              <span>{{ planDetails[plan]?.name }} subscription</span>
+              <strong>{{ planDetails[plan]?.price }}/mo</strong>
             </div>
-            <div>
-              <p class="card-label">Expires</p>
-              <p class="card-value">{{ card.expiry || 'MM/YY' }}</p>
-            </div>
-          </div>
-        </div>
 
-        <form (ngSubmit)="submit()" class="pay-form">
-
-          <div class="field">
-            <label>Name on Card</label>
-            <input type="text" [(ngModel)]="card.name" name="cardName" placeholder="e.g. Thabo Mokoena" autocomplete="cc-name" />
-          </div>
-
-          <div class="field">
-            <label>Card Number</label>
-            <input
-              type="text"
-              [value]="card.number"
-              (input)="formatCardNumber($event)"
-              name="cardNumber"
-              placeholder="1234 5678 9012 3456"
-              maxlength="19"
-              autocomplete="cc-number" />
-          </div>
-
-          <div class="field-row">
-            <div class="field">
-              <label>Expiry Date</label>
-              <input
-                type="text"
-                [value]="card.expiry"
-                (input)="formatExpiry($event)"
-                name="expiry"
-                placeholder="MM/YY"
-                maxlength="5"
-                autocomplete="cc-exp" />
-            </div>
-            <div class="field">
-              <label>CVV</label>
-              <input
-                type="password"
-                [(ngModel)]="card.cvv"
-                name="cvv"
-                placeholder="•••"
-                maxlength="4"
-                autocomplete="cc-csc" />
-            </div>
-          </div>
-
-          @if (error()) {
-            <div class="error-box">⚠️ {{ error() }}</div>
-          }
-
-          <button type="submit" class="pay-btn" [disabled]="loading()">
-            @if (loading()) {
-              <span class="btn-spinner"></span> Processing...
-            } @else {
-              🔒 Pay {{ planDetails[plan]?.price }} & Activate
+            @if (error()) {
+              <div class="error-box">⚠️ {{ error() }}</div>
             }
-          </button>
 
-        </form>
+            <button type="submit" class="pay-btn" [disabled]="loading()">
+              @if (loading()) {
+                <span class="btn-spinner"></span> Redirecting...
+              } @else {
+                🔒 Continue to secure payment
+              }
+            </button>
+
+            <p class="trust-line">Powered by Paystack · 🇿🇦 ZAR billing · Cancel anytime</p>
+          </form>
+        }
 
         <div class="trust-badges">
           <span>🔒 SSL Secure</span>
