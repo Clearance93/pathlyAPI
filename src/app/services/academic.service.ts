@@ -2,25 +2,24 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { AiResponse, PsychometricScores } from '../models/ai-response.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AcademicService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://localhost:7135/api/AcademicAnalysis/analysis';
+  private apiUrl = `${environment.apiUrl}/AcademicAnalysis/analysis`;
 
   analyzeResults(base64File: string, mimeType: string, fileName?: string): Observable<AiResponse> {
     return this.http.post<any>(this.apiUrl, { base64File, mimeType, fileName }).pipe(
-      map(res => {
-        console.log('Raw API response:', JSON.stringify(res));
-        return this.mapResponse(res);
-      })
+      map(res => this.mapResponse(res))
     );
   }
 
-  analyzePsychometric(extractionAcademicRecordId: string, psychometric: PsychometricScores): Observable<AiResponse> {
-    return this.http.post<any>('https://localhost:7135/api/AcademicAnalysis/psychometric-analysis', {
+  analyzePsychometric(extractionAcademicRecordId: string, psychometric: PsychometricScores, userId?: string): Observable<AiResponse> {
+    return this.http.post<any>(`${environment.apiUrl}/AcademicAnalysis/psychometric-analysis`, {
       extractionAcademicRecordId,
-      psychometric
+      psychometric,
+      userId
     }).pipe(map(res => this.mapResponse(res)));
   }
 
@@ -62,33 +61,21 @@ export class AcademicService {
         careerRelevance: s.careerRelevance,
         improvementTip: s.improvementTip
       })),
-      topFiveBestCareers: (res.top5BestCareers ?? []).map((c: any) => {
-        console.log('Career raw:', JSON.stringify(c));
-        console.log('Total careers from API:', (res.top5BestCareers ?? []).length);
-        return {
-          title: c.title ?? c.Title ?? c.careerTitle ?? '',
-          reason: c.reason ?? c.Reason ?? '',
-          field: c.field ?? c.Field ?? '',
-          matchPercentage: c.matchPercentage ?? c.MatchPercentage ?? 0,
-          requiredSubjects: Array.isArray(c.requiredSubjects) ? c.requiredSubjects.join(', ') : (c.requiredSubjects ?? c.RequiredSubjects ?? ''),
-          universityCourse: c.universityCourse ?? c.UniversityCourse ?? '',
-          jobDescription: c.jobDescription ?? c.JobDescription ?? '',
-          growthPotential: c.growthPotential ?? c.growthPotentials ?? c.GrowthPotential ?? 'N/A',
-          salaryRange: c.salaryRange ?? c.SalaryRange ?? '',
-          timeToQualify: c.timeToQualify ?? c.TimeToQualify ?? '',
-          topCompaniesHiring: c.topCompaniesHiring ?? c.TopCompaniesHiring ?? []
-        };
-      }),
+      topFiveBestCareers: (res.top3BestCareers ?? (res as any).Top3BestCareers ?? []).map((c: any) => ({
+        title: c.title ?? c.Title ?? c.careerTitle ?? '',
+        reason: c.reason ?? c.Reason ?? '',
+        field: c.field ?? c.Field ?? '',
+        matchPercentage: c.matchPercentage ?? c.MatchPercentage ?? 0,
+        requiredSubjects: Array.isArray(c.requiredSubjects) ? c.requiredSubjects.join(', ') : (c.requiredSubjects ?? c.RequiredSubjects ?? ''),
+        universityCourse: c.universityCourse ?? c.UniversityCourse ?? '',
+        jobDescription: c.jobDescription ?? c.JobDescription ?? '',
+        growthPotential: c.growthPotential ?? c.growthPotentials ?? c.GrowthPotential ?? 'N/A',
+        salaryRange: c.salaryRange ?? c.SalaryRange ?? '',
+        timeToQualify: c.timeToQualify ?? c.TimeToQualify ?? '',
+        topCompaniesHiring: c.topCompaniesHiring ?? c.TopCompaniesHiring ?? []
+      })),
       topFiveAlternativeCareer: (() => {
         const raw = res.alternativeCareers ?? res.topFiveAlternativeCareer ?? res.topFiveAlternativeCareers ?? res.alternativeCareer ?? res.AlternativeCareers ?? [];
-        console.log('Alternative careers raw key check:', {
-          alternativeCareers: res.alternativeCareers,
-          topFiveAlternativeCareer: res.topFiveAlternativeCareer,
-          topFiveAlternativeCareers: res.topFiveAlternativeCareers,
-          alternativeCareer: res.alternativeCareer,
-          AlternativeCareers: res.AlternativeCareers,
-          chosen: raw
-        });
         return raw.map((c: any) => ({
           title: c.title ?? c.Title ?? c.careerTitle ?? '',
           reason: c.reason ?? c.Reason ?? '',

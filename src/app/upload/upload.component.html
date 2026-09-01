@@ -117,7 +117,7 @@
         </div>
         <div class="profile-stat">
           <p class="ps-label">Career Matches</p>
-          <p class="ps-value">{{ r.topFiveBestCareers.length }}</p>
+          <p class="ps-value">{{ visibleBestCareers.length }}</p>
         </div>
       </div>
 
@@ -230,7 +230,7 @@
       @if (visibleBestCareers.length > 0) {
         <section class="result-section">
           <div class="section-head">
-            <h3>🏆 Strongest Career Matches</h3>
+            <h3>🏆 Strongest Career Matches <span class="count-pill">{{ visibleBestCareers.length }}</span></h3>
             <p class="section-sub-text">Pathly identifies these as strong matches based on your current academic profile</p>
           </div>
 

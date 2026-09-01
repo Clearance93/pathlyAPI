@@ -190,7 +190,10 @@
         <div class="results-header">
           <div class="results-badge">🎯 Career Interest Profile Complete</div>
           <h1>Your Career Interest Profile</h1>
-          <p class="results-sub">Based on {{ 78 }} questions across three assessment types, here is a comprehensive picture of your career interests and personality.</p>
+          <p class="results-sub">Based on {{ totalQuestions }} questions across three assessment types, here is a comprehensive picture of your career interests and personality.</p>
+          @if (storeError()) {
+            <p class="results-sub store-warning">We couldn't save your assessment to your account just now — your results are still shown below.</p>
+          }
         </div>
 
         <!-- Top 3 types -->

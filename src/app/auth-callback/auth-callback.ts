@@ -27,7 +27,7 @@ export class AuthCallbackComponent implements OnInit {
     if (data) {
       try {
         const user: AuthUser = JSON.parse(decodeURIComponent(data));
-        this.auth.saveFromSocialRedirect({ ...user, plan: (user as any).plan ?? 'pro' });
+        this.auth.saveFromSocialRedirect({ ...user, plan: (user as any).plan ?? 'free' });
         this.router.navigate(['/analyze']);
       } catch {
         this.error = 'Could not complete sign in. Please try again.';
