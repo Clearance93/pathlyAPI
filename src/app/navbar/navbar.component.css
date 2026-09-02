@@ -19,7 +19,7 @@
   z-index: 101;
 }
 
-.brand-icon { font-size: 1.5rem; }
+.brand-icon { height: 2rem; width: 2rem; object-fit: contain; display: block; }
 
 .brand-ai { color: #a78bfa; }
 

@@ -65,11 +65,22 @@
 .back-link:hover { color: #fff; }
 
 .summary-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 1rem;
   font-weight: 800;
   background: linear-gradient(90deg, #a78bfa, #60a5fa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.summary-logo-img {
+  height: 1.6rem;
+  width: 1.6rem;
+  object-fit: contain;
+  display: block;
+  -webkit-text-fill-color: initial;
 }
 
 .order-summary h2 { font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,0.85); }
