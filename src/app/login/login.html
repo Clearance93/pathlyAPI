@@ -26,6 +26,14 @@
         <div class="error-box">⚠️ {{ error() }}</div>
       }
 
+      @if (notConfirmed()) {
+        <button type="button" class="link-btn" (click)="resendConfirmation()">Resend verification email</button>
+      }
+
+      @if (resendMessage()) {
+        <div class="info-box">{{ resendMessage() }}</div>
+      }
+
       <button type="submit" class="submit-btn" [disabled]="loading()">
         @if (loading()) { <span class="btn-spinner"></span> }
         Sign In →
@@ -33,6 +41,7 @@
 
     </form>
 
+    <p class="forgot-link"><a routerLink="/forgot-password">Forgot your password?</a></p>
     <p class="login-link">Don't have an account? <a routerLink="/register" [queryParams]="{plan:'pro'}">Create one free</a></p>
   </div>
 </div>

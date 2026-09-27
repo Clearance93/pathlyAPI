@@ -36,8 +36,8 @@ export class PsychometricService {
     return this.http.post<StoredPsychometricAssessment>(`${BASE}/assessment`, submission);
   }
 
-  /** The learner's most recent stored assessment, if any. */
-  getLatestForUser(userId: string): Observable<StoredPsychometricAssessment> {
-    return this.http.get<StoredPsychometricAssessment>(`${BASE}/assessment/${userId}`);
+  /** The logged-in learner's most recent stored assessment, if any (account taken from the token). */
+  getLatest(): Observable<StoredPsychometricAssessment> {
+    return this.http.get<StoredPsychometricAssessment>(`${BASE}/assessment/me`);
   }
 }

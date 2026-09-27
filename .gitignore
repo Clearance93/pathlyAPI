@@ -44,3 +44,6 @@ __screenshots__/
 Thumbs.db
 
 .env
+
+# Command Code tooling (local taste/settings)
+.commandcode/

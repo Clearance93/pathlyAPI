@@ -82,8 +82,23 @@
       <!-- Top nav -->
       <div class="results-topbar">
         <button class="back-btn" (click)="clearResult()">← New Analysis</button>
-        <span class="intel-badge">📊 Academic Career Intelligence</span>
+        <span class="intel-badge">{{ isPremiumReport() ? '🧠 Combined Career Intelligence' : '📊 Academic Career Intelligence' }}</span>
       </div>
+
+      <!-- Extraction quality warning -->
+      @if (extractionWarnings().length) {
+        <div class="warning-box">
+          <span class="warning-icon">⚠️</span>
+          <div>
+            <p class="warning-title">Please double-check the extracted results</p>
+            @for (w of extractionWarnings(); track $index) { <p class="warning-line">{{ w }}</p> }
+          </div>
+        </div>
+      }
+
+      @if (historyLoading()) {
+        <div class="history-loading">Opening your stored report…</div>
+      }
 
       <!-- Learner header -->
       <div class="learner-header">
@@ -91,6 +106,11 @@
         <div>
           <h2 class="learner-name">{{ r.userFullName }}</h2>
           @if (r.grade) { <p class="learner-grade">{{ r.grade }}</p> }
+          @if (r.driverTermLabel || r.generatedAt) {
+            <p class="learner-meta">
+              {{ r.driverTermLabel || 'Overall results' }}@if (r.generatedAt) { · {{ formatHistoryDate(r.generatedAt) }} }
+            </p>
+          }
         </div>
         <div class="learner-personality">
           <p class="lp-label">Academic Personality</p>
@@ -205,6 +225,31 @@
               }
             </div>
           }
+        </section>
+      }
+
+      <!-- ── NEXT-TERM PROJECTION ── -->
+      @if (prediction(); as p) {
+        <section class="result-section">
+          <div class="section-head">
+            <h3>📈 Next-Term Projection</h3>
+            <p class="section-sub-text">Estimated from your uploaded term history — a planning guide, not a guarantee</p>
+          </div>
+          <div class="prediction-grid">
+            @for (sp of p.subjectPredictions; track $index) {
+              <div class="prediction-card">
+                <span class="pred-subject">{{ sp.subjectName }}</span>
+                <span class="pred-band">{{ sp.projectedLow }}–{{ sp.projectedHigh }}%</span>
+                <span class="pred-dir" [class.up]="sp.direction === 'up'" [class.down]="sp.direction === 'down'">
+                  {{ sp.direction === 'up' ? '▲ rising' : (sp.direction === 'down' ? '▼ falling' : '● steady') }}
+                </span>
+              </div>
+            }
+          </div>
+          @if (p.atRiskSubjects.length) {
+            <p class="pred-risk">⚠️ Prioritise: {{ p.atRiskSubjects.join(', ') }}</p>
+          }
+          @if (p.caveat) { <p class="pred-caveat">{{ p.caveat }}</p> }
         </section>
       }
 
@@ -323,30 +368,71 @@
         </section>
       }
 
-      <!-- ── PSYCHOMETRIC UPSELL ── -->
-      <section class="psycho-section">
-        <div class="psycho-inner">
-          <div class="psycho-text">
-            <p class="psycho-tag">🧠 Go beyond your marks</p>
-            <h3>Your results show us what you can academically pursue.</h3>
-            <p>Your Career Interest Profile helps Pathly understand what types of work may fit the way you think, what interests you and what motivates you — giving you a deeper, more personalised career recommendation.</p>
-            <div class="psycho-layers">
-              <div class="pl-item">
-                <span class="pl-dot academic"></span>
-                <span>Academic Profile — <em>what you may be prepared for</em></span>
-              </div>
-              <div class="pl-item">
-                <span class="pl-dot interest"></span>
-                <span>Career Interest Profile — <em>what may fit you</em></span>
+      <!-- ── CAREER INTEREST (PSYCHOMETRIC) LAYER ── -->
+      @if (psychometric(); as psy) {
+        <section class="psycho-section active">
+          <div class="psycho-inner">
+            <div class="psycho-text">
+              <p class="psycho-tag">🧠 Your Career Interest Profile</p>
+              <h3>Your interests, alongside your academic results.</h3>
+              <p>
+                These are your strongest interest dimensions from the career assessment.
+                @if (isPremiumReport()) {
+                  This report has already combined them with your academic profile.
+                } @else {
+                  Combine them with your academic results for a deeper, more personalised recommendation.
+                }
+              </p>
+              <div class="psycho-layers">
+                @for (t of topPsychometric(); track t.key) {
+                  <div class="pl-item">
+                    <span class="pl-dot interest"></span>
+                    <span>{{ t.emoji }} {{ t.label }} — <em>{{ t.score }}%</em></span>
+                  </div>
+                }
               </div>
             </div>
+            <div class="psycho-cta-wrap">
+              @if (isPremiumReport()) {
+                <p class="psycho-note">✅ Combined with your academic profile</p>
+              } @else if (sub.isPro()) {
+                <button class="btn-psycho" [disabled]="combinedLoading()" (click)="generateCombinedReport()">
+                  {{ combinedLoading() ? 'Generating…' : 'Generate Combined Report' }}
+                </button>
+                <p class="psycho-note">Uses your saved results + assessment — no re-upload</p>
+              } @else {
+                <button class="btn-psycho" routerLink="/upgrade">Upgrade to Combine</button>
+                <p class="psycho-note">Combined reports are included in the Pro plan</p>
+              }
+              @if (combinedError()) { <p class="psycho-error">{{ combinedError() }}</p> }
+            </div>
           </div>
-          <div class="psycho-cta-wrap">
-            <button class="btn-psycho" routerLink="/assessment">Take Career Assessment</button>
-            <p class="psycho-note">Included in the Pro plan</p>
+        </section>
+      } @else {
+        <section class="psycho-section">
+          <div class="psycho-inner">
+            <div class="psycho-text">
+              <p class="psycho-tag">🧠 Go beyond your marks</p>
+              <h3>Your results show us what you can academically pursue.</h3>
+              <p>Your Career Interest Profile helps Pathly understand what types of work may fit the way you think, what interests you and what motivates you — giving you a deeper, more personalised career recommendation.</p>
+              <div class="psycho-layers">
+                <div class="pl-item">
+                  <span class="pl-dot academic"></span>
+                  <span>Academic Profile — <em>what you may be prepared for</em></span>
+                </div>
+                <div class="pl-item">
+                  <span class="pl-dot interest"></span>
+                  <span>Career Interest Profile — <em>what may fit you</em></span>
+                </div>
+              </div>
+            </div>
+            <div class="psycho-cta-wrap">
+              <button class="btn-psycho" routerLink="/assessment">Take Career Assessment</button>
+              <p class="psycho-note">Included in the Pro plan</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      }
 
       <!-- ── ALTERNATIVE CAREERS ── -->
       @if (visibleAltCareers.length > 0) {
@@ -529,6 +615,39 @@
       }
       @if (r.teacherRecommendation) {
         <div class="feedback-box"><p class="fb-label">👩‍🏫 Teacher Recommendation</p><p>{{ r.teacherRecommendation }}</p></div>
+      }
+
+      <!-- ── HISTORY & PROGRESS ── -->
+      @if (history().length > 1) {
+        <section class="result-section history-section">
+          <div class="section-head">
+            <h3>🕘 Your Analysis History</h3>
+            <p class="section-sub-text">Every report is saved to your account — open an earlier one any time, on any device</p>
+          </div>
+          <div class="history-list">
+            @for (h of history(); track h.aiResponseId) {
+              <button class="history-row" [class.current]="h.aiResponseId === r.aiResponseId" (click)="openHistoryItem(h.aiResponseId)">
+                <span class="history-date">{{ formatHistoryDate(h.generatedAt) }}</span>
+                <span class="history-term">{{ h.driverTermLabel || h.studyLevel || 'Report' }}</span>
+                <span class="history-aps">{{ h.calculatedAps ?? '—' }} APS</span>
+                <span class="history-badge" [class.pro]="h.isPremium">{{ h.isPremium ? 'Combined' : 'Academic' }}</span>
+              </button>
+            }
+          </div>
+          @if (apsTrend().length > 1) {
+            <div class="trend">
+              <p class="trend-label">APS progress over time</p>
+              <div class="trend-bars">
+                @for (t of apsTrend(); track $index) {
+                  <div class="trend-col">
+                    <div class="trend-bar" [style.height.%]="(t.calculatedAps / 42) * 100"></div>
+                    <span class="trend-value">{{ t.calculatedAps }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </section>
       }
 
     </div>

@@ -44,7 +44,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         if (auth.isLoggedIn()) {
           auth.logout();
         }
-        router.navigate(['/login'], { queryParams: { session: 'expired', returnUrl: '/analyze' } });
+        router.navigate(['/login'], { queryParams: { session: 'expired', returnUrl: req.url } });
       }
       return throwError(() => err);
     })

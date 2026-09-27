@@ -241,13 +241,63 @@
           <p class="conclusion-text">{{ r.conclusion }}</p>
         </div>
 
+        <!-- Detailed interpretation -->
+        <div class="insight-section">
+          <h3>Detailed interpretation</h3>
+          <p class="insight-note">What each dimension means in practice — and where to stay mindful.</p>
+          <div class="insight-cards">
+            @for (ins of r.detailedInsights; track ins.key) {
+              <div class="insight-card" [style.border-color]="getTypeColor(ins.key) + '55'">
+                <div class="insight-head">
+                  <span class="insight-emoji">{{ ins.emoji }}</span>
+                  <span class="insight-name" [style.color]="getTypeColor(ins.key)">{{ ins.label }}</span>
+                  <span class="insight-score" [style.color]="getTypeColor(ins.key)">{{ ins.score }}% · {{ ins.band }}</span>
+                </div>
+                <p class="insight-summary">{{ ins.summary }}</p>
+                <p class="insight-env"><strong>Best environments:</strong> {{ ins.workEnvironment }}</p>
+                <div class="insight-cols">
+                  <div>
+                    <p class="insight-col-title">Strengths</p>
+                    <ul>@for (s of ins.strengths; track s) { <li>{{ s }}</li> }</ul>
+                  </div>
+                  <div>
+                    <p class="insight-col-title">Watch-outs</p>
+                    <ul>@for (w of ins.watchOuts; track w) { <li>{{ w }}</li> }</ul>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Working style -->
+        <div class="workstyle-box">
+          <p class="ws-label">🧭 Your Working Style</p>
+          <p class="ws-text">{{ r.workStyleSummary }}</p>
+        </div>
+
+        <!-- Development areas -->
+        @if (r.developmentAreas.length) {
+          <div class="dev-box">
+            <p class="dev-label">🌱 Development Areas</p>
+            <ul>@for (d of r.developmentAreas; track $index) { <li>{{ d }}</li> }</ul>
+          </div>
+        }
+
         <!-- Career suggestions -->
         <div class="careers-section">
           <h3>Careers that may suit your profile</h3>
-          <p class="careers-note">These suggestions are based on your top two interest types. When combined with your academic results, Pathly can refine these further.</p>
-          <div class="career-tags">
-            @for (c of r.careerSuggestions; track c) {
-              <span class="career-tag">{{ c }}</span>
+          <p class="careers-note">Each match shows why it fits your interest profile. Combine this with your academic results for a fuller picture.</p>
+          <div class="match-list">
+            @for (m of r.careerMatches; track m.title) {
+              <div class="match-item">
+                <div class="match-top">
+                  <span class="match-title">{{ m.title }}</span>
+                  <span class="match-align">{{ m.alignment }}%</span>
+                </div>
+                <div class="match-bar-track"><div class="match-bar-fill" [style.width.%]="m.alignment"></div></div>
+                <p class="match-reason">{{ m.reason }}</p>
+              </div>
             }
           </div>
         </div>

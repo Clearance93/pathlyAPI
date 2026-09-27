@@ -35,15 +35,31 @@
       <div class="field">
         <label>Password</label>
         <div class="input-wrap">
-          <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password" name="password" placeholder="Min. 6 characters" autocomplete="new-password" />
+          <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password" name="password" placeholder="Min. 8 characters" autocomplete="new-password" />
           <button type="button" class="toggle-pw" (click)="showPassword.set(!showPassword())">{{ showPassword() ? '🙈' : '👁️' }}</button>
         </div>
+        <p class="pw-hint">At least 8 characters with an uppercase letter, a lowercase letter, a number and a symbol.</p>
       </div>
 
       <div class="field">
         <label>Confirm Password</label>
         <input type="password" [(ngModel)]="form.confirmPassword" name="confirmPassword" placeholder="Repeat your password" autocomplete="new-password" />
       </div>
+
+      <!-- POPIA consent -->
+      <label class="consent-row">
+        <input type="checkbox" [(ngModel)]="form.acceptTerms" name="acceptTerms" />
+        <span>
+          I have read and accept the
+          <a routerLink="/terms" target="_blank">Terms of Service</a> and
+          <a routerLink="/privacy" target="_blank">Privacy Policy</a>.
+        </span>
+      </label>
+
+      <label class="consent-row">
+        <input type="checkbox" [(ngModel)]="form.marketingConsent" name="marketingConsent" />
+        <span>Send me career tips and product updates (optional).</span>
+      </label>
 
       @if (error()) {
         <div class="error-box">⚠️ {{ error() }}</div>
@@ -57,6 +73,6 @@
     </form>
 
     <p class="login-link">Already have an account? <a routerLink="/login">Sign in</a></p>
-    <p class="terms">By continuing you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+    <p class="terms">Your data is processed in line with POPIA. You can export or delete it at any time from the <a routerLink="/privacy">Privacy Policy</a> page.</p>
   </div>
 </div>

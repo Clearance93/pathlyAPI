@@ -95,9 +95,56 @@ export interface PsychometricScores {
   conventional: number;
 }
 
-export interface AiResponse {
-  aiReponseId: string;
+export interface SubjectPrediction {
+  subjectName: string;
+  latestMark: number;
+  projectedLow: number;
+  projectedHigh: number;
+  direction: 'up' | 'down' | 'steady' | string;
+  lowConfidence: boolean;
+}
+
+export interface AcademicPrediction {
+  isPredictionAvailable: boolean;
+  nextTermOrdinal?: number | null;
+  nextTermLabel?: string | null;
+  subjectPredictions: SubjectPrediction[];
+  atRiskSubjects: string[];
+  caveat?: string | null;
+}
+
+export interface AnalysisHistoryItem {
+  aiResponseId: string;
   extractionAcademicRecordId?: string | null;
+  generatedAt: string;
+  studyLevel?: string | null;
+  driverTermLabel?: string | null;
+  overallScore: number;
+  calculatedAps?: number | null;
+  isPremium: boolean;
+  academicPersonality?: string | null;
+}
+
+export interface ApsTrendPoint {
+  generatedAt: string;
+  calculatedAps: number;
+  label?: string | null;
+}
+
+export interface AnalysisHistoryResponse {
+  items: AnalysisHistoryItem[];
+  apsTrend: ApsTrendPoint[];
+}
+
+export interface AiResponse {
+  aiResponseId: string;
+  extractionAcademicRecordId?: string | null;
+  driverTermLabel?: string | null;
+  isPremium?: boolean;
+  generatedAt?: string | null;
+  academicPrediction?: AcademicPrediction | null;
+  needsManualReview?: boolean;
+  extractionWarnings?: string[] | null;
   userFullName: string;
   grade: string;
   summary: string;

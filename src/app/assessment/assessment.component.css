@@ -522,3 +522,54 @@ h1 {
   color: #dc2626;
   font-weight: 500;
 }
+
+/* ── Detailed report additions ── */
+.insight-section { margin: 2rem 0; }
+.insight-note { font-size: 0.85rem; opacity: 0.75; margin-bottom: 1rem; }
+.insight-cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.insight-card {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  background: rgba(148, 163, 184, 0.05);
+}
+.insight-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.insight-emoji { font-size: 1.15rem; }
+.insight-name { font-weight: 700; }
+.insight-score { margin-left: auto; font-size: 0.78rem; font-weight: 600; }
+.insight-summary { font-size: 0.88rem; margin-bottom: 0.5rem; }
+.insight-env { font-size: 0.82rem; opacity: 0.85; margin-bottom: 0.6rem; }
+.insight-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.insight-col-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.65; margin-bottom: 0.25rem; }
+.insight-cols ul { margin: 0; padding-left: 1rem; }
+.insight-cols li { font-size: 0.8rem; margin-bottom: 0.2rem; }
+.workstyle-box, .dev-box {
+  border-left: 3px solid #a78bfa;
+  background: rgba(167, 139, 250, 0.08);
+  border-radius: 0 12px 12px 0;
+  padding: 1rem 1.2rem;
+  margin: 1.25rem 0;
+}
+.dev-box { border-left-color: #34d399; background: rgba(52, 211, 153, 0.08); }
+.ws-label, .dev-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: #c4b5fd; margin-bottom: 0.35rem; }
+.dev-label { color: #6ee7b7; }
+.ws-text { font-size: 0.9rem; }
+.dev-box ul { margin: 0; padding-left: 1.1rem; }
+.dev-box li { font-size: 0.85rem; margin-bottom: 0.3rem; }
+.match-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.match-item {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  background: rgba(148, 163, 184, 0.04);
+}
+.match-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.match-title { font-weight: 600; font-size: 0.9rem; }
+.match-align { font-size: 0.8rem; color: #a78bfa; font-weight: 700; }
+.match-bar-track { height: 6px; border-radius: 999px; background: rgba(148, 163, 184, 0.18); overflow: hidden; }
+.match-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #a78bfa, #60a5fa); }
+.match-reason { font-size: 0.82rem; opacity: 0.85; margin-top: 0.5rem; }
+
+@media (max-width: 620px) {
+  .insight-cols { grid-template-columns: 1fr; }
+}

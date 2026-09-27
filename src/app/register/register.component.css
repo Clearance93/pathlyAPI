@@ -211,6 +211,21 @@ h1 { text-align: center; font-size: 1.6rem; font-weight: 800; margin-bottom: 0.4
 .terms a { color: rgba(255,255,255,0.4); text-decoration: none; }
 .terms a:hover { color: #fff; }
 
+.pw-hint { font-size: 0.74rem; color: rgba(255,255,255,0.4); }
+
+.consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.4;
+  cursor: pointer;
+}
+.consent-row input { margin-top: 0.15rem; accent-color: #a78bfa; }
+.consent-row a { color: #a78bfa; text-decoration: none; }
+.consent-row a:hover { text-decoration: underline; }
+
 @media (max-width: 480px) {
   .field-row { grid-template-columns: 1fr; }
   .auth-card { padding: 1.75rem 1.25rem; }
