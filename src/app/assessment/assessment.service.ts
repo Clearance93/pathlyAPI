@@ -241,6 +241,7 @@ export class AssessmentService {
       trueFalseAnswers,
       multipleChoiceAnswers: { ...mcAnswers },
       profile,
+      reportJson: JSON.stringify(result)
     }).subscribe({
       error: () => onStoreError(),
     });

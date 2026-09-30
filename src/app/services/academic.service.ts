@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { AiResponse, AcademicPrediction, AnalysisHistoryResponse, PsychometricScores } from '../models/ai-response.model';
+import { AiResponse, AcademicPrediction, AnalysisHistoryResponse, Progression, PsychometricScores } from '../models/ai-response.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -64,6 +64,8 @@ export class AcademicService {
       needsManualReview: res.needsManualReview ?? res.NeedsManualReview ?? false,
       extractionWarnings: res.extractionWarnings ?? res.ExtractionWarnings ?? [],
       academicPrediction: this.mapAcademicPrediction(res.academicPrediction ?? res.AcademicPrediction),
+      progression: this.mapProgression(res.progression ?? res.Progression),
+      psychometricIncluded: res.psychometricIncluded ?? res.PsychometricIncluded ?? false,
       userFullName: res.userFullName,
       grade: res.grade,
       summary: res.summary,
@@ -96,6 +98,33 @@ export class AcademicService {
       })),
       atRiskSubjects: prediction.atRiskSubjects ?? [],
       caveat: prediction.caveat ?? null,
+    };
+  }
+
+  private mapProgression(progression: any): Progression | null {
+    if (!progression) return null;
+
+    return {
+      isAvailable: progression.isAvailable ?? false,
+      uploadCount: progression.uploadCount ?? 0,
+      periodCount: progression.periodCount ?? 0,
+      periodLabels: progression.periodLabels ?? [],
+      firstAps: progression.firstAps ?? null,
+      latestAps: progression.latestAps ?? null,
+      apsChange: progression.apsChange ?? null,
+      summary: progression.summary ?? '',
+      subjectTrends: (progression.subjectTrends ?? []).map((t: any) => ({
+        subjectName: t.subjectName ?? '',
+        canonicalName: t.canonicalName ?? '',
+        direction: t.direction ?? 'insufficient-data',
+        changeSinceFirst: t.changeSinceFirst ?? null,
+        points: (t.points ?? []).map((p: any) => ({
+          periodLabel: p.periodLabel ?? '',
+          academicYear: p.academicYear ?? null,
+          termOrdinal: p.termOrdinal ?? null,
+          mark: p.mark ?? null,
+        })),
+      })),
     };
   }
 

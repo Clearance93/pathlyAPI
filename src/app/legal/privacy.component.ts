@@ -56,12 +56,20 @@ import { AccountService } from '../services/account.service';
             details on our website.</p>
           }
 
-          <h2>7. Security</h2>
+          <h2>7. Cookies &amp; local storage</h2>
+          <p>We use a single essential, httpOnly cookie to keep you signed in securely (your refresh
+          token). We also keep a small amount of data in your browser's local storage — scoped to your
+          account and cleared in full when you sign out — to cache your report and preferences. We do
+          not use advertising or third-party tracking cookies.</p>
+
+          <h2>8. Security</h2>
           <p>Your data is scoped to your account. Results are stored server-side and never shown to another user,
           including on shared devices — signing out clears all locally cached data.</p>
 
-          <h2>8. Contact</h2>
-          <p>For privacy requests, contact our information officer via the details on our website.</p>
+          <h2>9. Contact</h2>
+          <p>For privacy requests, contact our Information Officer at
+          <a href="mailto:privacy@pathly.example">privacy@pathly.example</a>. You may also lodge a
+          complaint with the Information Regulator of South Africa (<a href="https://inforegulator.org.za" target="_blank" rel="noopener">inforegulator.org.za</a>).</p>
         </div>
       </div>
     </div>

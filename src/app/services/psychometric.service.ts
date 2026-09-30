@@ -10,6 +10,8 @@ export interface PsychometricSubmission {
   trueFalseAnswers: Record<string, boolean>;
   multipleChoiceAnswers: Record<string, string>;
   profile: PsychometricScores;
+  /** Serialized detailed report so it is durable and available on any device. */
+  reportJson?: string;
 }
 
 export interface StoredPsychometricAssessment {
@@ -23,6 +25,7 @@ export interface StoredPsychometricAssessment {
   answeredQuestions: number;
   servedFromExisting: boolean;
   completedAt: string;
+  reportJson?: string | null;
 }
 
 const BASE = `${environment.apiUrl}/Psychometric`;

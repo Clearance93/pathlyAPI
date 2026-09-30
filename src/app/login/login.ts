@@ -31,7 +31,9 @@ export class LoginComponent {
       this.error.set('Social sign-in failed. Please try again or use email and password.');
     }
 
-    if (params.get('session') === 'expired') {
+    if (params.get('session') === 'idle') {
+      this.error.set('You were signed out after 30 minutes of inactivity. Please sign in again.');
+    } else if (params.get('session') === 'expired') {
       this.error.set('Your session has expired. Please sign in again to continue.');
     }
 

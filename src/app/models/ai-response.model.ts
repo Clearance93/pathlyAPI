@@ -131,6 +131,33 @@ export interface ApsTrendPoint {
   label?: string | null;
 }
 
+export interface SubjectTrendPoint {
+  periodLabel: string;
+  academicYear?: number | null;
+  termOrdinal?: number | null;
+  mark?: number | null;
+}
+
+export interface SubjectTrend {
+  subjectName: string;
+  canonicalName: string;
+  points: SubjectTrendPoint[];
+  changeSinceFirst?: number | null;
+  direction: 'improving' | 'declining' | 'steady' | 'insufficient-data' | string;
+}
+
+export interface Progression {
+  isAvailable: boolean;
+  uploadCount: number;
+  periodCount: number;
+  periodLabels: string[];
+  firstAps?: number | null;
+  latestAps?: number | null;
+  apsChange?: number | null;
+  subjectTrends: SubjectTrend[];
+  summary: string;
+}
+
 export interface AnalysisHistoryResponse {
   items: AnalysisHistoryItem[];
   apsTrend: ApsTrendPoint[];
@@ -143,6 +170,8 @@ export interface AiResponse {
   isPremium?: boolean;
   generatedAt?: string | null;
   academicPrediction?: AcademicPrediction | null;
+  progression?: Progression | null;
+  psychometricIncluded?: boolean;
   needsManualReview?: boolean;
   extractionWarnings?: string[] | null;
   userFullName: string;

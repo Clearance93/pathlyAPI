@@ -77,6 +77,20 @@ export class UploadComponent {
   /** Deterministic next-term projection from the multi-term history, when available. */
   prediction = computed(() => this.result()?.academicPrediction ?? null);
 
+  /** Cross-upload progression across every stored upload (termly/yearly trends). */
+  progression = computed(() => this.result()?.progression ?? null);
+
+  private static readonly ALLOWED_MIME = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+  private static readonly ALLOWED_EXT = ['pdf', 'jpg', 'jpeg', 'png'];
+
+  /** Rejects unsupported uploads up front (not just by size), mirroring the server-side check. */
+  private isSupportedFile(file: File): boolean {
+    const ext = (file.name.split('.').pop() ?? '').toLowerCase();
+    if (!UploadComponent.ALLOWED_EXT.includes(ext)) return false;
+    // Some browsers/OSes leave file.type empty — fall back to the extension check above.
+    return !file.type || UploadComponent.ALLOWED_MIME.includes(file.type.toLowerCase());
+  }
+
   /** True when the report already fused the academic and psychometric layers. */
   isPremiumReport = computed(() => this.result()?.isPremium === true);
 
@@ -120,6 +134,10 @@ export class UploadComponent {
     const MAX_MB = 1.5;
     if (file.size > MAX_MB * 1024 * 1024) {
       this.error.set(`File too large. Please upload under ${MAX_MB}MB.`);
+      return;
+    }
+    if (!this.isSupportedFile(file)) {
+      this.error.set('Please upload a PDF or an image (JPG or PNG).');
       return;
     }
     this.fileName.set(file.name);

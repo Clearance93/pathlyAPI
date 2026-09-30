@@ -61,6 +61,12 @@
         <span>Send me career tips and product updates (optional).</span>
       </label>
 
+      @if (captchaRequired) {
+        <div class="turnstile-wrap">
+          <div #turnstile class="turnstile"></div>
+        </div>
+      }
+
       @if (error()) {
         <div class="error-box">⚠️ {{ error() }}</div>
       }

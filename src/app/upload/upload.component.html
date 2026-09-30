@@ -253,6 +253,31 @@
         </section>
       }
 
+      <!-- ── CROSS-UPLOAD PROGRESSION ── -->
+      @if (progression()?.isAvailable) {
+        <section class="result-section">
+          <div class="section-head">
+            <h3>📊 Progress Over Time</h3>
+            <p class="section-sub-text">{{ progression()!.summary }}</p>
+          </div>
+          <div class="progression-grid">
+            @for (t of progression()!.subjectTrends; track t.canonicalName) {
+              <div class="progression-card">
+                <span class="prog-subject">{{ t.subjectName }}</span>
+                <span class="prog-delta"
+                      [class.up]="t.direction === 'improving'"
+                      [class.down]="t.direction === 'declining'">
+                  {{ t.changeSinceFirst === null ? '—' : (t.changeSinceFirst! >= 0 ? '+' : '') + t.changeSinceFirst + '%' }}
+                </span>
+                <span class="prog-dir">
+                  {{ t.direction === 'improving' ? '▲ improving' : (t.direction === 'declining' ? '▼ declining' : (t.direction === 'steady' ? '● steady' : '· not enough data')) }}
+                </span>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
       <!-- ── STRENGTHS ── -->
       @if (r.userStrength || r.userWeaknesses) {
         <div class="strengths-grid">

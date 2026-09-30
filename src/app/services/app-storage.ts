@@ -6,6 +6,9 @@
 export const STORAGE_PREFIX = 'pathly_';
 export const AUTH_KEY = 'pathly_auth';
 
+/** Heartbeat written on user activity so idle-timeout is shared across tabs on one device. */
+export const ACTIVITY_KEY = 'pathly_last_activity';
+
 /** Result + assessment caches are namespaced per account id. */
 export function resultKey(userId: string): string {
   return `pathly_result_${userId}`;
