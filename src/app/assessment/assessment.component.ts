@@ -27,6 +27,13 @@ export class AssessmentComponent {
   mcAnswers = signal<Record<number, 'R' | 'I' | 'A' | 'S' | 'E' | 'C'>>({});
   storeError = signal(false);
 
+  /** Scrolls to the top of the page after Angular has rendered the new section.
+   *  'instant' bypasses the global smooth-scroll, whose animation was getting
+   *  cancelled by the re-render and left the page mid-way down. */
+  private scrollTop() {
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  }
+
   overallProgress = computed(() => {
     const rDone = Object.keys(this.ratingAnswers()).length;
     const tDone = Object.keys(this.tfAnswers()).length;
@@ -48,12 +55,12 @@ export class AssessmentComponent {
       this.phase.set('truefalse');
       this.tfGroup.set(0);
     }
-    scrollTo(0, 0);
+    this.scrollTop();
   }
 
   prevRatingGroup() {
     if (this.ratingGroup() > 0) this.ratingGroup.update(g => g - 1);
-    scrollTo(0, 0);
+    this.scrollTop();
   }
 
   currentTfGroupAnswered = computed(() =>
@@ -69,7 +76,7 @@ export class AssessmentComponent {
     } else {
       this.phase.set('multichoice');
     }
-    scrollTo(0, 0);
+    this.scrollTop();
   }
 
   prevTfGroup() {
@@ -79,7 +86,7 @@ export class AssessmentComponent {
       this.phase.set('rating');
       this.ratingGroup.set(this.ratingGroups.length - 1);
     }
-    scrollTo(0, 0);
+    this.scrollTop();
   }
 
   allMcAnswered = computed(() => this.mcQuestions.every((q: McQuestion) => this.mcAnswers()[q.id] !== undefined));
@@ -90,7 +97,7 @@ export class AssessmentComponent {
   prevMc() {
     this.phase.set('truefalse');
     this.tfGroup.set(this.tfGroups.length - 1);
-    scrollTo(0, 0);
+    this.scrollTop();
   }
 
   result = computed(() => this.service.computeResult(this.phase(), this.ratingAnswers(), this.tfAnswers(), this.mcAnswers()));
@@ -103,7 +110,7 @@ export class AssessmentComponent {
 
   submitAssessment() {
     this.phase.set('results');
-    scrollTo(0, 0);
+    this.scrollTop();
     this.service.submitAssessment(this.ratingAnswers(), this.tfAnswers(), this.mcAnswers(), this.result()!, () => this.storeError.set(true));
   }
 
@@ -115,7 +122,7 @@ export class AssessmentComponent {
     this.tfGroup.set(0);
     this.phase.set('rating');
     this.service.clearStoredResult();
-    scrollTo(0, 0);
+    this.scrollTop();
   }
 
   goToDashboard() { this.service.goToDashboard(); }
