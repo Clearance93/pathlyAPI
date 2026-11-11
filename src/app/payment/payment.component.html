@@ -43,10 +43,31 @@
 
         @if (paymentsUnavailable()) {
           <div class="coming-soon-box">
-            <p class="cs-icon">🚀</p>
-            <h3>Payments launching soon</h3>
-            <p>We're putting the finishing touches on online checkout. You currently have <strong>full free access</strong> — enjoy everything while we finish.</p>
-            <button type="button" class="pay-btn" (click)="goBack()">← Back to analyzing</button>
+            <p class="cs-icon">&#128274;</p>
+            <h3>Online checkout is not available yet</h3>
+            <p>
+              We're putting the finishing touches on card and EFT payments. Your account stays on the
+              <strong>Free</strong> tier until checkout opens.
+            </p>
+
+            @if (devActivationAvailable()) {
+              <p class="dev-note">
+                Local development: activate <strong>{{ planDetails[plan]?.name }}</strong> directly to
+                test the tiers without a payment provider.
+              </p>
+              @if (error()) {
+                <div class="error-box">&#9888;&#65039; {{ error() }}</div>
+              }
+              <button type="button" class="pay-btn" [disabled]="loading()" (click)="activateForDevelopment()">
+                @if (loading()) {
+                  <span class="btn-spinner"></span> Activating...
+                } @else {
+                  Activate {{ planDetails[plan]?.name }} (dev)
+                }
+              </button>
+            }
+
+            <button type="button" class="pay-btn secondary" (click)="goBack()">&larr; Back to analyzing</button>
           </div>
         } @else {
           <form (ngSubmit)="submit()" class="pay-form">

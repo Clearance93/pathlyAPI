@@ -1,11 +1,11 @@
 import { Component, DestroyRef, HostListener, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AcademicService } from '../services/academic.service';
 import { AuthService } from '../services/auth.service';
 import { SubscriptionService } from '../services/subscription.service';
-import { BillingService } from '../services/billing.service';
+import { BillingService, UsageSummary } from '../services/billing.service';
 import { PsychometricService, StoredPsychometricAssessment } from '../services/psychometric.service';
 import { resultKey } from '../services/app-storage';
 import { TYPE_META, RiasecKey } from '../assessment/assessment.data';
@@ -22,6 +22,7 @@ import {
 })
 export class UploadComponent {
   private service = inject(AcademicService);
+  private router = inject(Router);
   sub = inject(SubscriptionService);
   private billing = inject(BillingService);
   private psychometricApi = inject(PsychometricService);
@@ -33,6 +34,7 @@ export class UploadComponent {
     this.restoreResult();
     this.loadPsychometric();
     this.loadHistory();
+    this.refreshUsage();
   }
 
   fileName = signal('');
@@ -48,6 +50,19 @@ export class UploadComponent {
   history = signal<AnalysisHistoryItem[]>([]);
   apsTrend = signal<ApsTrendPoint[]>([]);
   historyLoading = signal(false);
+  usage = signal<UsageSummary | null>(null);
+  usageLoading = signal(false);
+  usageCheckFailed = signal(false);
+  usageLimitReached = computed(() => {
+    const summary = this.usage();
+    return summary?.monthlyAnalysisQuota != null &&
+      summary.analysesUsedThisMonth >= summary.monthlyAnalysisQuota;
+  });
+  remainingAnalyses = computed(() => {
+    const summary = this.usage();
+    if (!summary || summary.monthlyAnalysisQuota == null) return null;
+    return Math.max(0, summary.monthlyAnalysisQuota - summary.analysesUsedThisMonth);
+  });
 
   // Psychometric layer (the career assessment) for this account.
   psychometric = signal<StoredPsychometricAssessment | null>(null);
@@ -67,12 +82,36 @@ export class UploadComponent {
 
   private stepInterval: ReturnType<typeof setInterval> | null = null;
 
-  get visibleBestCareers(): CareerMatch[]                  { return this.result()?.topFiveBestCareers ?? []; }
-  get visibleAltCareers(): CareerMatch[]                   { return this.result()?.topFiveAlternativeCareer ?? []; }
-  get visibleDemandingJobs(): DemandingCareerAssessment[]  { return this.result()?.topDemandingJobs ?? []; }
-  get visibleDyingCareers(): DyingCareerWarning[]          { return this.result()?.dyingCareers ?? []; }
-  get visibleOutlook(): EmploymentOutlook[]                { return this.result()?.employmentOutlookAfterGraduation ?? []; }
-  get visibleSubjects(): SubjectResult[]                   { return this.result()?.subjectResults ?? []; }
+  get visibleBestCareers(): CareerMatch[]                  { return this.limitPreview(this.result()?.topFiveBestCareers ?? []); }
+  get visibleAltCareers(): CareerMatch[]                   { return this.limitPreview(this.result()?.topFiveAlternativeCareer ?? []); }
+  get visibleDemandingJobs(): DemandingCareerAssessment[]  { return this.limitPreview(this.result()?.topDemandingJobs ?? []); }
+  get visibleDyingCareers(): DyingCareerWarning[]          { return this.limitPreview(this.result()?.dyingCareers ?? []); }
+  get visibleOutlook(): EmploymentOutlook[]                { return this.limitPreview(this.result()?.employmentOutlookAfterGraduation ?? []); }
+  get visibleSubjects(): SubjectResult[]                   { return this.limitPreview(this.result()?.subjectResults ?? []); }
+
+  /** Free accounts see one sample item per section; every paid tier sees the full list. */
+  private limitPreview<T>(items: T[]): T[] {
+    const max = this.sub.previewLimit();
+    return items.length > max ? items.slice(0, max) : items;
+  }
+
+  /** True while the report is being shown as a one-item-per-section sample. */
+  isPreview = computed(() => this.sub.isFree());
+
+  /** How many items are hidden behind the preview, across every list section. */
+  previewLockedCount = computed(() => {
+    const r = this.result();
+    if (!r || !this.sub.isFree()) return 0;
+    const max = this.sub.previewLimit();
+    return [
+      r.topFiveBestCareers,
+      r.topFiveAlternativeCareer,
+      r.topDemandingJobs,
+      r.dyingCareers,
+      r.employmentOutlookAfterGraduation,
+      r.subjectResults
+    ].reduce((total, list) => total + Math.max(0, (list?.length ?? 0) - max), 0);
+  });
 
   /** Deterministic next-term projection from the multi-term history, when available. */
   prediction = computed(() => this.result()?.academicPrediction ?? null);
@@ -126,11 +165,23 @@ export class UploadComponent {
   }
 
   onFileSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    // Clearing immediately lets the same file be selected again after a failed scan.
+    input.value = '';
     if (file) this.processFile(file);
   }
 
   private processFile(file: File): void {
+    if (this.usageLoading()) {
+      this.error.set('Checking your monthly analysis allowance. Please try again in a moment.');
+      return;
+    }
+    if (this.usageLimitReached()) {
+      this.error.set("You've used all of your analyses for this month. View plans to continue.");
+      return;
+    }
+
     const MAX_MB = 1.5;
     if (file.size > MAX_MB * 1024 * 1024) {
       this.error.set(`File too large. Please upload under ${MAX_MB}MB.`);
@@ -142,16 +193,32 @@ export class UploadComponent {
     }
     this.fileName.set(file.name);
     if (file.type.startsWith('image/')) {
-      this.compressImage(file).then(base64 => this.submit(base64, 'image/jpeg', file.name));
+      this.compressImage(file).then(base64 => {
+        if (!base64) {
+          this.error.set('We could not process that image. Please choose another scan or save it as a JPG/PNG and try again.');
+          this.fileName.set('');
+          return;
+        }
+        this.submit(base64, 'image/jpeg', file.name);
+      }).catch(() => {
+        this.error.set('We could not process that image. Please choose another scan and try again.');
+        this.fileName.set('');
+      });
     } else {
       const reader = new FileReader();
       reader.onload = () => {
         const result = reader.result as string;
         const base64 = result.split(',')[1];
-        if (base64) this.submit(base64, file.type, file.name);
+        if (base64) {
+          this.submit(base64, file.type, file.name);
+        } else {
+          this.error.set('We could not read that file. Please choose it again or try another copy.');
+          this.fileName.set('');
+        }
       };
       reader.onerror = () => {
         this.error.set('Failed to read file. Please try again.');
+        this.fileName.set('');
         this.loading.set(false);
       };
       reader.readAsDataURL(file);
@@ -214,8 +281,10 @@ export class UploadComponent {
   private loadHistory(): void {
     if (!this.auth.isLoggedIn()) return;
 
+    this.historyLoading.set(true);
     this.service.getHistory().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: res => {
+        this.historyLoading.set(false);
         this.history.set(res.items ?? []);
         this.apsTrend.set(res.apsTrend ?? []);
 
@@ -224,7 +293,10 @@ export class UploadComponent {
           this.openHistoryItem(res.items[0].aiResponseId);
         }
       },
-      error: () => { /* history is a convenience — never block the upload flow on it */ }
+      error: () => {
+        this.historyLoading.set(false);
+        /* history is a convenience — never block the upload flow on it */
+      }
     });
   }
 
@@ -278,6 +350,7 @@ export class UploadComponent {
       error: (err) => {
         this.stopLoadingSteps();
         if (err.status === 402) {
+          this.refreshUsage();
           const detail = err.error?.message;
           this.error.set(detail
             ? `${detail} Visit the plans page to upgrade.`
@@ -296,6 +369,7 @@ export class UploadComponent {
         } else {
           this.error.set("We couldn't complete your career analysis right now. Please try again.");
         }
+        this.fileName.set('');
         this.loading.set(false);
       }
     });
@@ -305,8 +379,12 @@ export class UploadComponent {
   generateCombinedReport(): void {
     this.combinedError.set('');
 
-    if (!this.sub.isPro()) {
-      this.combinedError.set('Combined academic + interest reports are part of the Pro plan.');
+    if (!this.sub.isPremium()) {
+      this.combinedError.set(
+        this.sub.isStandard()
+          ? 'Combined academic + interest reports are part of the Premium plan. Your Standard plan covers the academic report only.'
+          : 'Combined academic + interest reports are part of the Premium plan.'
+      );
       return;
     }
 
@@ -322,7 +400,7 @@ export class UploadComponent {
       error: err => {
         this.combinedLoading.set(false);
         if (err.status === 402) {
-          this.combinedError.set(err.error?.message ?? 'Combined reports are part of the Pro plan.');
+          this.combinedError.set(err.error?.message ?? 'Combined reports are part of the Premium plan.');
         } else if (err.status === 404) {
           this.combinedError.set(err.error?.message ?? 'Upload your results and complete the assessment first.');
         } else {
@@ -352,13 +430,24 @@ export class UploadComponent {
 
   /** Pulls authoritative month-to-date usage from the billing engine. */
   private refreshUsage(): void {
+    if (!this.auth.isLoggedIn()) return;
+    this.usageLoading.set(true);
+    this.usageCheckFailed.set(false);
     this.billing.getUsage().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: summary => {
+        this.usage.set(summary);
+        this.usageLoading.set(false);
+        // The billing engine is authoritative — adopt its tier so an upgrade shows immediately.
+        this.auth.updatePlan(summary.planCode);
         if (summary.planCode !== 'free') {
           this.sub.resetUsage();
         }
       },
-      error: () => { /* offline-tolerant: local counter stays as-is */ }
+      error: () => {
+        this.usageLoading.set(false);
+        this.usageCheckFailed.set(true);
+        /* The API still enforces the quota if this live hint cannot be loaded. */
+      }
     });
   }
 
@@ -374,8 +463,27 @@ export class UploadComponent {
     this.result.set(null);
     this.fileName.set('');
     this.error.set('');
+  }
+
+  /** Return from the upload form to the last saved dashboard report. */
+  returnToDashboard(): void {
     const key = this.currentResultKey();
-    if (key && typeof sessionStorage !== 'undefined') sessionStorage.removeItem(key);
+    if (key && typeof sessionStorage !== 'undefined') {
+      const saved = sessionStorage.getItem(key);
+      if (saved) {
+        try {
+          this.storeResult(JSON.parse(saved));
+          return;
+        } catch {
+          sessionStorage.removeItem(key);
+        }
+      }
+    }
+
+    if (this.historyLoading()) return;
+    const latest = this.history()[0];
+    if (latest) this.openHistoryItem(latest.aiResponseId);
+    else this.router.navigate(['/']);
   }
 
   getMatchLabel(pct: number): string {

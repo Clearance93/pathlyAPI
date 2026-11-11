@@ -13,12 +13,15 @@ import { VerifyEmailComponent } from './auth/verify-email.component';
 import { TermsComponent } from './legal/terms.component';
 import { PrivacyComponent } from './legal/privacy.component';
 import { authGuard } from './auth.guard';
+import { psychometricGuard } from './premium.guard';
+import { PaymentCallbackComponent } from './payment/payment-callback.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'analyze', component: UploadComponent, canActivate: [authGuard] },
-  { path: 'assessment', component: AssessmentComponent, canActivate: [authGuard] },
-  { path: 'upgrade', component: UpgradeComponent, canActivate: [authGuard] },
+  { path: 'assessment', component: AssessmentComponent, canActivate: [authGuard, psychometricGuard] },
+  // Pricing is public so "Change plan" on the register page works before an account exists.
+  { path: 'upgrade', component: UpgradeComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
@@ -27,6 +30,7 @@ export const routes: Routes = [
   { path: 'terms', component: TermsComponent },
   { path: 'privacy', component: PrivacyComponent },
   { path: 'auth-callback', component: AuthCallbackComponent },
+  { path: 'payment/callback', component: PaymentCallbackComponent, canActivate: [authGuard] },
   { path: 'payment', component: PaymentComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

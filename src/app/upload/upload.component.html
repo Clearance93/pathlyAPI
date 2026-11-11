@@ -3,7 +3,7 @@
   <!-- ══ UPLOAD SCREEN ══ -->
   @if (!result()) {
     <div class="upload-shell">
-      <a routerLink="/" class="back-link">← Back</a>
+      <button type="button" class="back-link" (click)="returnToDashboard()">← Back to Dashboard</button>
 
       <div class="upload-hero">
         <div class="upload-badge">🎓 Pathly Career Intelligence</div>
@@ -13,7 +13,7 @@
 
       <!-- Drop zone -->
       <label class="drop-zone" [class.drag-active]="dragOver()" [class.has-file]="fileName()">
-        <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)" />
+        <input type="file" accept=".pdf,.jpg,.jpeg,.png" [disabled]="usageLoading() || usageLimitReached()" (change)="onFileSelected($event)" />
         @if (!loading()) {
           <div class="drop-inner">
             <div class="drop-icon">{{ fileName() ? '📄' : '☁️' }}</div>
@@ -22,6 +22,23 @@
           </div>
         }
       </label>
+
+      @if (usageLoading()) {
+        <p class="usage-status" role="status">Checking your monthly analysis allowance…</p>
+      } @else if (usage(); as allowance) {
+        @if (remainingAnalyses() !== null) {
+          <p class="usage-status" [class.usage-exhausted]="usageLimitReached()">
+            @if (usageLimitReached()) {
+              You’ve used all {{ allowance.monthlyAnalysisQuota }} analyses for this month.
+              <a routerLink="/upgrade">View plans →</a>
+            } @else {
+              {{ remainingAnalyses() }} of {{ allowance.monthlyAnalysisQuota }} analyses remaining this month.
+            }
+          </p>
+        }
+      } @else if (usageCheckFailed()) {
+        <p class="usage-status">We couldn’t check your allowance. Your available limit will be confirmed when you submit.</p>
+      }
 
       <!-- AI Progress -->
       @if (loading()) {
@@ -118,6 +135,22 @@
         </div>
       </div>
 
+      <!-- Free-preview notice -->
+      @if (isPreview()) {
+        <div class="preview-banner">
+          <div class="preview-banner-text">
+            <p class="preview-title">👀 You're viewing a free preview</p>
+            <p class="preview-sub">
+              Every report section shows one sample so you can see what's inside.
+              @if (previewLockedCount() > 0) {
+                <strong>{{ previewLockedCount() }} more item{{ previewLockedCount() === 1 ? '' : 's' }}</strong> are waiting for you.
+              }
+            </p>
+          </div>
+          <a routerLink="/upgrade" class="preview-cta">See plans →</a>
+        </div>
+      }
+
       <!-- ── ACADEMIC PROFILE STRIP ── -->
       <div class="profile-strip">
         <div class="profile-stat">
@@ -128,7 +161,7 @@
           <div class="profile-stat aps-stat">
             <p class="ps-label">APS Score</p>
             <p class="ps-value grad">{{ r.apsAnalysis!.calculatedAPS }}</p>
-            <p class="ps-sub">{{ (r.apsAnalysis!.calculatedAPS ?? 0) >= 23 ? '✅ University Ready' : '⚠️ Below University Threshold' }}</p>
+            <p class="ps-sub">Indicative points · check course requirements</p>
           </div>
         }
         <div class="profile-stat">
@@ -153,7 +186,7 @@
               <div class="subject-card">
                 <div class="subject-top">
                   <span class="subject-name">{{ s.subject }}</span>
-                  <span class="subject-grade" [class]="s.grade.toLowerCase()">{{ s.grade }}</span>
+                  <span class="subject-grade" [class]="s.grade.toLowerCase().replace(' ', '-')">{{ s.grade }}</span>
                 </div>
                 <div class="subject-mark-row">
                   <div class="subject-bar"><div class="subject-fill" [style.width.%]="s.mark"></div></div>
@@ -172,20 +205,18 @@
         <section class="result-section">
           <div class="section-head">
             <h3>📊 APS Analysis</h3>
-            <p class="section-sub-text">Your APS is one component of your career intelligence — not the whole picture</p>
+            <p class="section-sub-text">Estimated from the extracted marks using standard NSC achievement levels. Universities may count subjects differently and have additional requirements.</p>
           </div>
           <div class="aps-card">
             <div class="aps-left">
               <p class="aps-label">Calculated APS</p>
               <p class="aps-big grad">{{ aps.calculatedAPS }}</p>
-              <span class="aps-badge" [class.qualified]="(aps.calculatedAPS ?? 0) >= 23">
-                {{ (aps.calculatedAPS ?? 0) >= 23 ? '✅ Qualifies for University' : '⚠️ Does Not Qualify Yet' }}
-              </span>
+              <span class="aps-badge">Indicative points · verify programme requirements</span>
               @if (aps.qualificationMessage) { <p class="aps-msg">{{ aps.qualificationMessage }}</p> }
             </div>
             <div class="aps-right">
               @if (aps.universitiesTheyQualifyFor?.length) {
-                <p class="aps-uni-label">Universities you qualify for</p>
+                <p class="aps-uni-label">Listed APS thresholds met · confirm programme rules</p>
                 <div class="aps-uni-list">
                   @for (u of aps.universitiesTheyQualifyFor!; track $index) {
                     <div class="aps-uni-row qualify">
@@ -196,7 +227,7 @@
                 </div>
               }
               @if (aps.universitiesTheyDoNotQualifyFor?.length) {
-                <p class="aps-uni-label muted">Not yet qualifying</p>
+                <p class="aps-uni-label muted">Below the listed APS threshold</p>
                 <div class="aps-uni-list">
                   @for (u of aps.universitiesTheyDoNotQualifyFor!; track $index) {
                     <div class="aps-uni-row no-qualify">
@@ -301,7 +332,7 @@
         <section class="result-section">
           <div class="section-head">
             <h3>🏆 Strongest Career Matches <span class="count-pill">{{ visibleBestCareers.length }}</span></h3>
-            <p class="section-sub-text">Pathly identifies these as strong matches based on your current academic profile</p>
+            <p class="section-sub-text">These are exploration suggestions based on your current academic profile, not guarantees of admission or career suitability. Discuss decisions with a career guidance professional.</p>
           </div>
 
           <!-- Match overview bar chart -->
@@ -393,8 +424,9 @@
         </section>
       }
 
-      <!-- ── CAREER INTEREST (PSYCHOMETRIC) LAYER ── -->
+      <!-- ── CAREER INTEREST (PSYCHOMETRIC) LAYER — Premium only ── -->
       @if (psychometric(); as psy) {
+        @if (sub.canUsePsychometrics()) {
         <section class="psycho-section active">
           <div class="psycho-inner">
             <div class="psycho-text">
@@ -418,21 +450,44 @@
               </div>
             </div>
             <div class="psycho-cta-wrap">
+              <a routerLink="/assessment" class="btn-psycho-secondary">View detailed assessment</a>
               @if (isPremiumReport()) {
                 <p class="psycho-note">✅ Combined with your academic profile</p>
-              } @else if (sub.isPro()) {
+              } @else if (sub.isPremium()) {
                 <button class="btn-psycho" [disabled]="combinedLoading()" (click)="generateCombinedReport()">
                   {{ combinedLoading() ? 'Generating…' : 'Generate Combined Report' }}
                 </button>
                 <p class="psycho-note">Uses your saved results + assessment — no re-upload</p>
+              } @else if (sub.isStandard()) {
+                <button class="btn-psycho" routerLink="/upgrade">Upgrade to Premium</button>
+                <p class="psycho-note">Standard covers the academic report only — Premium adds psychometrics and combined reports</p>
               } @else {
-                <button class="btn-psycho" routerLink="/upgrade">Upgrade to Combine</button>
-                <p class="psycho-note">Combined reports are included in the Pro plan</p>
+                <button class="btn-psycho" routerLink="/upgrade">Unlock the Full Report</button>
+                <p class="psycho-note">You're previewing one interest dimension — Premium shows all of them</p>
               }
               @if (combinedError()) { <p class="psycho-error">{{ combinedError() }}</p> }
             </div>
           </div>
         </section>
+        } @else {
+          <section class="psycho-section">
+            <div class="psycho-inner">
+              <div class="psycho-text">
+                <p class="psycho-tag">🔒 Premium feature</p>
+                <h3>Your Career Interest Profile is waiting.</h3>
+                <p>Psychometrics are part of the Premium plan. Premium adds the career-interest assessment and combines it with your academic results for a deeper, more personalised recommendation.</p>
+                <div class="psycho-layers">
+                  <div class="pl-item"><span class="pl-dot academic"></span><span>Academic Profile — <em>what you may be prepared for</em></span></div>
+                  <div class="pl-item"><span class="pl-dot interest"></span><span>Career Interest Profile — <em>Premium unlocks what may fit you</em></span></div>
+                </div>
+              </div>
+              <div class="psycho-cta-wrap">
+                <button class="btn-psycho" routerLink="/upgrade">Upgrade to Premium</button>
+                <p class="psycho-note">Your saved assessment will unlock as soon as you upgrade</p>
+              </div>
+            </div>
+          </section>
+        }
       } @else {
         <section class="psycho-section">
           <div class="psycho-inner">
@@ -452,8 +507,13 @@
               </div>
             </div>
             <div class="psycho-cta-wrap">
-              <button class="btn-psycho" routerLink="/assessment">Take Career Assessment</button>
-              <p class="psycho-note">Included in the Pro plan</p>
+              @if (sub.isPremium()) {
+                <button class="btn-psycho" routerLink="/assessment">Take Career Assessment</button>
+                <p class="psycho-note">Included in the Premium plan</p>
+              } @else {
+                <button class="btn-psycho" routerLink="/upgrade">Upgrade to Premium</button>
+                <p class="psycho-note">The Career Interest Assessment is part of the Premium plan</p>
+              }
             </div>
           </div>
         </section>

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, finalize, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AUTH_KEY, clearUserScopedStorage } from './app-storage';
+import { PlanCode, normalizePlan } from './plan-tier';
 
 export interface AuthUser {
   id: string;
@@ -11,7 +12,8 @@ export interface AuthUser {
   fullName?: string;
   token: string;
   expiration: string;
-  plan: 'free' | 'pro' | 'school';
+  /** `pro`/`school` are legacy codes and are treated as premium by SubscriptionService. */
+  plan: PlanCode;
   /** Rotating refresh token — used to renew the short-lived access token silently. */
   refreshToken?: string;
 }
@@ -39,7 +41,10 @@ export class AuthService {
   });
 
   plan  = computed(() => this.currentUser()?.plan ?? 'free');
-  isPro = computed(() => this.plan() === 'pro' || this.plan() === 'school');
+  /** Any paying tier (standard or premium, including legacy pro/school codes). */
+  isPro = computed(() => normalizePlan(this.plan()) !== 'free');
+  /** Premium is the only tier with psychometrics + combined reports. */
+  isPremium = computed(() => normalizePlan(this.plan()) === 'premium');
 
   /** The signed-in account id, or null. Used to namespace per-user caches. */
   currentUserId = computed(() => this.currentUser()?.id ?? null);
@@ -166,11 +171,30 @@ export class AuthService {
       ...current,
       token: user.token ?? (user as any).Token ?? current.token,
       expiration: user.expiration ?? (user as any).expirationDate ?? (user as any).ExpirationDate ?? current.expiration,
-      refreshToken: user.refreshToken ?? (user as any).RefreshToken ?? current.refreshToken
+      refreshToken: user.refreshToken ?? (user as any).RefreshToken ?? current.refreshToken,
+      // The server is authoritative on the tier — an upgrade/downgrade shows up on refresh.
+      plan: normalizePlan((user as any).plan ?? (user as any).Plan ?? current.plan)
     };
 
     this.currentUser.set(merged);
     if (this.isBrowser) localStorage.setItem(AUTH_KEY, JSON.stringify(merged));
+  }
+
+  /**
+   * Adopts the tier reported by the billing engine (e.g. after a checkout completes)
+   * so the UI reflects an upgrade without forcing a sign-out.
+   */
+  updatePlan(planCode: string | null | undefined) {
+    if (!planCode) return;
+    const current = this.currentUser();
+    if (!current) return;
+
+    const tier = normalizePlan(planCode);
+    if (current.plan === tier) return;
+
+    const next: AuthUser = { ...current, plan: tier };
+    this.currentUser.set(next);
+    if (this.isBrowser) localStorage.setItem(AUTH_KEY, JSON.stringify(next));
   }
 
   private persist(user: AuthUser, plan: AuthUser['plan'] = 'free') {
@@ -182,7 +206,7 @@ export class AuthService {
       clearUserScopedStorage();
     }
 
-    const withPlan = { ...normalized, plan: (user as any).plan ?? plan };
+    const withPlan = { ...normalized, plan: normalizePlan((user as any).plan ?? (user as any).Plan ?? plan) };
     this.currentUser.set(withPlan);
     if (this.isBrowser) localStorage.setItem(AUTH_KEY, JSON.stringify(withPlan));
   }
@@ -197,7 +221,8 @@ export class AuthService {
       fullName: user.fullName ?? (user as any).fullName ?? (user as any).FullName,
       token: user.token ?? (user as any).Token ?? '',
       expiration: user.expiration ?? (user as any).expirationDate ?? (user as any).ExpirationDate ?? '',
-      refreshToken: user.refreshToken ?? (user as any).RefreshToken ?? undefined
+      refreshToken: user.refreshToken ?? (user as any).RefreshToken ?? undefined,
+      plan: normalizePlan(user.plan ?? (user as any).Plan ?? 'free')
     };
   }
 }

@@ -12,7 +12,7 @@ import { AccountService } from '../services/account.service';
       <div class="auth-card wide">
         <a routerLink="/" class="back-link">← Back to home</a>
         <h1>Privacy Policy</h1>
-        <p class="legal-updated">Last updated: January 2026 · POPIA compliant</p>
+        <p class="legal-updated">Last updated: January 2026 · Please review with a POPIA specialist before launch</p>
 
         <div class="legal-body">
           <h2>1. Who we are</h2>
@@ -67,9 +67,9 @@ import { AccountService } from '../services/account.service';
           including on shared devices — signing out clears all locally cached data.</p>
 
           <h2>9. Contact</h2>
-          <p>For privacy requests, contact our Information Officer at
-          <a href="mailto:privacy@pathly.example">privacy@pathly.example</a>. You may also lodge a
-          complaint with the Information Regulator of South Africa (<a href="https://inforegulator.org.za" target="_blank" rel="noopener">inforegulator.org.za</a>).</p>
+          <p>PathlyAI's verified Information Officer contact details must be confirmed and published before launch.
+          Do not send personal information to an unverified address. You may also lodge a complaint with the
+          Information Regulator of South Africa (<a href="https://inforegulator.org.za" target="_blank" rel="noopener">inforegulator.org.za</a>).</p>
         </div>
       </div>
     </div>

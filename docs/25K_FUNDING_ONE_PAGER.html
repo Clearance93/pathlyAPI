@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PathlyAI — R25,000 funding breakdown</title>
+<style>
+  :root{
+    --ink: var(--foreground);
+    --line: var(--border);
+    --soft: var(--muted);
+    --panel: var(--card);
+    --accent: var(--primary);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+    color: var(--foreground);
+    background: transparent;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{max-width: 728px; margin: 0 auto; padding: 4px 10px 8px}
+  .eyebrow{
+    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted-foreground);
+  }
+  .eyebrow b{color:var(--foreground); letter-spacing:.06em}
+  h1{
+    font-size: 40px; line-height:1.02; letter-spacing:-.035em;
+    font-weight: 700; margin: 14px 0 6px;
+  }
+  h1 span{color:var(--muted-foreground); font-weight:500}
+  .lede{font-size:15px; color:var(--muted-foreground); max-width:60ch; margin:0 0 18px}
+  .lede strong{color:var(--foreground); font-weight:600}
+
+  .stats{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    margin: 0 0 22px;
+  }
+  .stat{padding:12px 12px 12px 0}
+  .stat + .stat{padding-left:12px; border-left:1px solid var(--line)}
+  .stat .n{font-size:22px; font-weight:650; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+  .stat .l{font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted-foreground); margin-top:2px}
+
+  .section{margin-bottom:24px}
+  .section-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:10px}
+  h2{font-size:12px; text-transform:uppercase; letter-spacing:.12em; margin:0; color:var(--muted-foreground); font-weight:600}
+  .note{font-size:11px; color:var(--muted-foreground)}
+
+  .bars{display:flex; flex-direction:column; gap:2px}
+  .row{
+    display:grid; grid-template-columns: 200px 1fr 86px; gap:12px; align-items:center;
+    padding:6px 0; border-bottom:1px dotted var(--line);
+  }
+  .row:last-child{border-bottom:0}
+  .row .name{font-size:13px; font-weight:550}
+  .row .name small{display:block; font-weight:400; font-size:10.5px; color:var(--muted-foreground); letter-spacing:.01em}
+  .track{height:12px; background:var(--secondary); border-radius:2px; overflow:hidden; position:relative}
+  .fill{height:100%; border-radius:2px}
+  .amt{font-size:12.5px; text-align:right; font-variant-numeric:tabular-nums; color:var(--foreground)}
+  .row.total{border-top:1px solid var(--line); border-bottom:0; margin-top:4px; padding-top:10px}
+  .row.total .name, .row.total .amt{font-weight:700}
+  .row.total .track{background:transparent}
+
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:26px}
+  ul.tight{margin:0; padding:0; list-style:none}
+  ul.tight li{
+    font-size:12.5px; padding:6px 0 6px 16px; border-bottom:1px solid var(--line);
+    position:relative; color:var(--foreground);
+  }
+  ul.tight li:last-child{border-bottom:0}
+  ul.tight li::before{
+    content:""; position:absolute; left:0; top:13px; width:5px; height:5px;
+    background:var(--chart-1); border-radius:1px;
+  }
+  ul.tight li.defer::before{background:var(--muted-foreground)}
+  ul.tight li span{display:block; font-size:10.5px; color:var(--muted-foreground); margin-top:1px}
+
+  .milestones{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .ms{
+    border:1px solid var(--line); border-radius:var(--radius, 8px); padding:12px 12px 11px;
+    background:var(--card);
+  }
+  .ms .pct{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-foreground)}
+  .ms .cash{font-size:22px; font-weight:650; letter-spacing:-.02em; margin:2px 0 6px; font-variant-numeric:tabular-nums}
+  .ms .what{font-size:11px; color:var(--muted-foreground)}
+  .ms .when{font-size:10.5px; margin-top:8px; padding-top:7px; border-top:1px dotted var(--line); color:var(--foreground)}
+
+  .callout{
+    display:grid; grid-template-columns: auto 1fr; gap:14px; align-items:center;
+    border:1px solid var(--line); border-left:3px solid var(--chart-2);
+    border-radius: var(--radius, 8px); padding:12px 14px; background:var(--card);
+  }
+  .callout .big{font-size:26px; font-weight:700; letter-spacing:-.03em; font-variant-numeric:tabular-nums}
+  .callout p{margin:0; font-size:12px; color:var(--muted-foreground)}
+  .callout p b{color:var(--foreground); font-weight:600}
+
+  footer{
+    margin-top:22px; padding-top:10px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    font-size:10.5px; color:var(--muted-foreground);
+  }
+  @media (max-width:620px){
+    h1{font-size:31px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .stat:nth-child(3){border-left:0; padding-left:0}
+    .stat:nth-child(n+3){border-top:1px solid var(--line)}
+    .row{grid-template-columns: 1fr 70px; gap:4px 10px}
+    .row .track{grid-column:1 / -1; grid-row:2}
+    .cols,.milestones{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow"><b>PathlyAI</b> · scope &amp; funding breakdown · 29 Oct 2026</div>
+  <h1>R25,000 <span>to reach first paying customers.</span></h1>
+  <p class="lede">
+    The product is built and tested. <strong>50 hours</strong> of work over <strong>six weeks</strong>
+    closes the commercial gap: live email, live Paystack payments, reliable hosting, security
+    hardening and end-to-end proof that money can change hands.
+  </p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">22</div><div class="l">API endpoints</div></div>
+    <div class="stat"><div class="n">106</div><div class="l">Backend tests</div></div>
+    <div class="stat"><div class="n">14</div><div class="l">App routes</div></div>
+    <div class="stat"><div class="n">12</div><div class="l">.NET projects</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Where the R25,000 goes</h2>
+      <div class="note">R450/h blended · 50 h</div>
+    </div>
+    <div class="bars">
+      <div class="row">
+        <div class="name">Payments &amp; email completion<small>Live Paystack, webhook, SMTP, quotas</small></div>
+        <div class="track"><div class="fill" style="width:100%; background:var(--chart-1)"></div></div>
+        <div class="amt">R8,100</div>
+      </div>
+      <div class="row">
+        <div class="name">Go-live hardening<small>Paid host, secrets, Turnstile, CI deploy</small></div>
+        <div class="track"><div class="fill" style="width:44.4%; background:var(--chart-2)"></div></div>
+        <div class="amt">R3,600</div>
+      </div>
+      <div class="row">
+        <div class="name">Frontend &amp; payment UX<small>Return states, mobile, errors, a11y</small></div>
+        <div class="track"><div class="fill" style="width:44.4%; background:var(--chart-3)"></div></div>
+        <div class="amt">R3,600</div>
+      </div>
+      <div class="row">
+        <div class="name">Contingency<small>6 hours held back</small></div>
+        <div class="track"><div class="fill" style="width:33.3%; background:var(--muted-foreground)"></div></div>
+        <div class="amt">R2,700</div>
+      </div>
+      <div class="row">
+        <div class="name">QA &amp; revenue-path tests<small>Playwright, webhook replay, browsers</small></div>
+        <div class="track"><div class="fill" style="width:33.3%; background:var(--chart-4)"></div></div>
+        <div class="amt">R2,700</div>
+      </div>
+      <div class="row">
+        <div class="name">Hosting, mail &amp; AI credits<small>First 2–3 months</small></div>
+        <div class="track"><div class="fill" style="width:30.9%; background:var(--chart-5)"></div></div>
+        <div class="amt">R2,500</div>
+      </div>
+      <div class="row">
+        <div class="name">Security, POPIA &amp; monitoring<small>Backup restore, alerts, data delete</small></div>
+        <div class="track"><div class="fill" style="width:27.8%; background:var(--chart-6)"></div></div>
+        <div class="amt">R2,250</div>
+      </div>
+      <div class="row">
+        <div class="name">Docs &amp; handover<small>Runbook, updated docs, call</small></div>
+        <div class="track"><div class="fill" style="width:16.7%; background:var(--muted-foreground)"></div></div>
+        <div class="amt">R1,350</div>
+      </div>
+      <div class="row total">
+        <div class="name">Total</div>
+        <div class="track"></div>
+        <div class="amt">R25,000</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Paid in three milestones</h2>
+      <div class="note">Exit criteria shown before payment</div>
+    </div>
+    <div class="milestones">
+      <div class="ms">
+        <div class="pct">30% · Kickoff</div>
+        <div class="cash">R7,500</div>
+        <div class="what">Paid host live, secrets set, Turnstile on, plan agreed.</div>
+        <div class="when">Week 1</div>
+      </div>
+      <div class="ms">
+        <div class="pct">40% · Chargeable</div>
+        <div class="cash">R10,000</div>
+        <div class="what">Sandbox payment upgrades an account; emails deliver; payment UX done.</div>
+        <div class="when">Week 4</div>
+      </div>
+      <div class="ms">
+        <div class="pct">30% · Handover</div>
+        <div class="cash">R7,500</div>
+        <div class="what">Revenue-path tests green, alerts and backup proven, runbook delivered.</div>
+        <div class="when">Week 6</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="section">
+      <div class="section-head"><h2>What it fixes</h2></div>
+      <ul class="tight">
+        <li>Live payments<span>Paystack keys, signed webhook, entitlements, failures</span></li>
+        <li>Live email<span>Reset and verification actually arrive</span></li>
+        <li>Always-on hosting<span>No free-tier sleep on checkout or webhooks</span></li>
+        <li>Bot &amp; secret hygiene<span>Turnstile enabled, keys out of files</span></li>
+        <li>AI cost caps<span>Per-plan quotas, retries, cost log</span></li>
+        <li>Proof it works<span>End-to-end purchase and report in CI</span></li>
+      </ul>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>Deliberately excluded</h2></div>
+      <ul class="tight">
+        <li>School dashboard &amp; bulk upload<span>Legacy plan, not in current pricing — Phase 2</span></li>
+        <li class="defer">Legal review of Terms/Privacy<span>A lawyer still needs to sign off</span></li>
+        <li class="defer">Marketing, design, app stores<span>Out of scope for this round</span></li>
+        <li class="defer">New AI features<span>No scope creep inside 50 hours</span></li>
+        <li class="defer">Fees beyond R2,500<span>Further hosting, mail and AI usage</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="big">106</div>
+    <p><b>backend tests already pass</b>, alongside 19 frontend tests and green CI on both repos.
+    The ask funds the last mile, not a prototype.</p>
+  </div>
+
+  <footer>
+    <span>pathlyAPI (Angular 21) · PathlyAI_API (.NET 10, EF Core, SQL Server)</span>
+    <span>Full document: docs/25K_FUNDING_BREAKDOWN.md</span>
+  </footer>
+
+</div>
+</body>
+</html>

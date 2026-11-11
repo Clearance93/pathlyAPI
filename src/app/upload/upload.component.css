@@ -2,10 +2,15 @@
 
 .back-link {
   display: inline-block;
+  width: fit-content;
+  border: 0;
+  padding: 0;
+  background: transparent;
   color: rgba(255,255,255,0.45);
   font-size: 0.85rem;
   text-decoration: none;
   margin-bottom: 1.5rem;
+  cursor: pointer;
   transition: color 0.2s;
 }
 .back-link:hover { color: #fff; }
@@ -633,6 +638,21 @@
   transform: translateY(-1px);
 }
 
+.btn-psycho-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid rgba(167,139,250,0.4);
+  border-radius: 999px;
+  color: #ddd6fe;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+.btn-psycho-secondary:hover { background: rgba(167,139,250,0.12); }
+
 .psycho-note {
   color: rgba(255,255,255,0.6);
   font-size: 0.88rem;
@@ -952,6 +972,13 @@ h1 {
 .subject-grade.merit { background: rgba(96,165,250,0.15); color: #93c5fd; }
 .subject-grade.pass { background: rgba(251,191,36,0.15); color: #fcd34d; }
 .subject-grade.fail { background: rgba(239,68,68,0.15); color: #fca5a5; }
+.subject-grade.level-7 { background: rgba(52,211,153,0.15); color: #6ee7b7; }
+.subject-grade.level-6,
+.subject-grade.level-5 { background: rgba(96,165,250,0.15); color: #93c5fd; }
+.subject-grade.level-4,
+.subject-grade.level-3 { background: rgba(251,191,36,0.15); color: #fcd34d; }
+.subject-grade.level-2,
+.subject-grade.level-1 { background: rgba(239,68,68,0.15); color: #fca5a5; }
 
 .subject-mark-row { display: flex; align-items: center; gap: 0.5rem; }
 .subject-bar { flex: 1; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
@@ -1509,3 +1536,58 @@ h1 {
 .prog-delta.up { color: #34d399; }
 .prog-delta.down { color: #f87171; }
 .prog-dir { font-size: 0.72rem; opacity: 0.75; }
+
+.usage-status {
+  margin: -0.75rem 0 0;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.usage-status a { color: #c4b5fd; font-weight: 700; }
+.usage-status.usage-exhausted { color: #fca5a5; }
+
+@media (max-width: 560px) {
+  .subjects-grid,
+  .extras-grid,
+  .prediction-grid,
+  .progression-grid,
+  .career-cards,
+  .profile-strip { grid-template-columns: minmax(0, 1fr) !important; }
+  .results-shell,
+  .upload-shell,
+  .result-section,
+  .subject-card,
+  .aps-card,
+  .learner-header { min-width: 0; }
+  .subject-name,
+  .career-title,
+  .aps-uni-name { overflow-wrap: anywhere; }
+}
+
+/* Free-tier preview notice */
+.preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.16), rgba(96, 165, 250, 0.1));
+  border: 1px solid rgba(167, 139, 250, 0.35);
+}
+.preview-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.2rem; }
+.preview-sub { font-size: 0.82rem; opacity: 0.8; line-height: 1.5; }
+.preview-cta {
+  flex-shrink: 0;
+  padding: 0.55rem 1.15rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.preview-cta:hover { opacity: 0.9; transform: translateY(-1px); }

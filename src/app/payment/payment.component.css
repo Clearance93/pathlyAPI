@@ -275,3 +275,33 @@
   max-width: 380px;
   margin: 0 auto 1.25rem;
 }
+
+/* Development-only plan activation controls. */
+.coming-soon-box .dev-note {
+  color: #c4b5fd;
+  font-size: 0.85rem;
+  border-top: 1px dashed rgba(167, 139, 250, 0.25);
+  padding-top: 0.9rem;
+  margin-top: 0.4rem;
+}
+
+.coming-soon-box .pay-btn + .pay-btn,
+.coming-soon-box .dev-note + .pay-btn + .pay-btn {
+  margin-top: 0.6rem;
+}
+
+.pay-btn.secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.pay-btn.secondary:hover:not(:disabled) {
+  border-color: rgba(167, 139, 250, 0.6);
+  color: #fff;
+}
+
+.coming-soon-box .error-box {
+  max-width: 380px;
+  margin: 0 auto 0.9rem;
+}

@@ -18,6 +18,10 @@ export function riasecKey(userId: string): string {
   return `pathly_riasec_${userId}`;
 }
 
+export function assessmentDraftKey(userId: string): string {
+  return `pathly_assessment_draft_${userId}`;
+}
+
 export function usageKey(userId: string): string {
   return `pathly_free_usage_${userId}`;
 }

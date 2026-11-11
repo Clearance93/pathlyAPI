@@ -11,6 +11,12 @@
   justify-content: center;
 }
 
+.restore-state {
+  margin: 2rem auto;
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+}
+
 .shell {
   width: 100%;
   max-width: 780px;

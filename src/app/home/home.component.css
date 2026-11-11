@@ -178,12 +178,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.5rem 3rem;
+  max-width: 300px;
+  padding: 0.5rem 1.5rem;
 }
 
 .stat-num {
-  font-size: 2rem;
+  font-size: clamp(1rem, 1.6vw, 1.35rem);
   font-weight: 900;
+  text-align: center;
   background: linear-gradient(90deg, #a78bfa, #60a5fa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -492,6 +494,8 @@
   .btn-primary, .btn-ghost { width: 100%; text-align: center; }
   .mock-card { width: 100%; max-width: 100%; }
   .stat { padding: 0.5rem 1rem; }
+  .stat { max-width: 100%; }
+  .stat-num { font-size: 1rem; }
   .stat-divider { display: none; }
   .stats { gap: 0.5rem; }
   .section { padding: 4rem 1.25rem; }

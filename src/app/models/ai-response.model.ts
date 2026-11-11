@@ -27,6 +27,8 @@ export interface ApsAnalysis {
 export interface SubjectResult {
   subject: string;
   mark: number;
+  apsPoints?: number | null;
+  includedInApsCalculation?: boolean | null;
   grade: string;
   careerRelevance: string;
   improvementTip: string;

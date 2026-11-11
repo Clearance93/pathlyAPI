@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { PsychometricService } from '../services/psychometric.service';
-import { riasecKey } from '../services/app-storage';
+import { assessmentDraftKey, riasecKey } from '../services/app-storage';
 import {
   FullAssessmentResult,
   RiasecKey,
@@ -22,6 +22,15 @@ import {
 } from './assessment.data';
 
 type Phase = 'rating' | 'truefalse' | 'multichoice' | 'results';
+
+export interface AssessmentDraft {
+  phase: Exclude<Phase, 'results'>;
+  ratingGroup: number;
+  tfGroup: number;
+  ratingAnswers: Record<number, number>;
+  tfAnswers: Record<number, boolean | null>;
+  mcAnswers: Record<number, RiasecKey>;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AssessmentService {
@@ -199,9 +208,8 @@ export class AssessmentService {
 
     return `Your assessment results show a ${band} preference for ${t1.label} (${t1.emoji}) at ${s1}%, ` +
       `alongside a ${TYPE_META[topTypes[2]].label} and ${t2.label} leaning. ` +
-      `${TYPE_DETAIL[topTypes[0]].summary} Combined with your academic results, this gives Pathly a fuller ` +
-      `picture of not just what you are academically prepared for, but the kind of work that is likely to suit ` +
-      `the way you think and what motivates you. Use this as a guide for exploration — not a fixed label.`;
+      `${TYPE_DETAIL[topTypes[0]].summary} This is an interest profile, not an academic eligibility assessment. ` +
+      `Use it as a guide for exploration — not a fixed label or a substitute for advice from a career guidance professional.`;
   }
 
   submitAssessment(
@@ -256,13 +264,43 @@ export class AssessmentService {
   getStoredResult(): FullAssessmentResult | null {
     const key = this.storageKey();
     if (!key || typeof localStorage === 'undefined') return null;
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem(key);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      this.clearStoredResult();
+      return null;
+    }
   }
 
   clearStoredResult(): void {
     const key = this.storageKey();
     if (key && typeof localStorage !== 'undefined') localStorage.removeItem(key);
+  }
+
+  saveDraft(draft: AssessmentDraft): void {
+    const userId = this.auth.currentUserId();
+    if (!userId || typeof localStorage === 'undefined') return;
+    try { localStorage.setItem(assessmentDraftKey(userId), JSON.stringify(draft)); } catch { /* best-effort draft */ }
+  }
+
+  getDraft(): AssessmentDraft | null {
+    const userId = this.auth.currentUserId();
+    if (!userId || typeof localStorage === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem(assessmentDraftKey(userId));
+      return raw ? JSON.parse(raw) as AssessmentDraft : null;
+    } catch {
+      localStorage.removeItem(assessmentDraftKey(userId));
+      return null;
+    }
+  }
+
+  clearDraft(): void {
+    const userId = this.auth.currentUserId();
+    if (userId && typeof localStorage !== 'undefined') {
+      localStorage.removeItem(assessmentDraftKey(userId));
+    }
   }
 
   goToDashboard(): void {

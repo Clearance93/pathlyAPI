@@ -1,12 +1,16 @@
 <div class="page">
 
+  @if (restoring()) {
+    <div class="shell restore-state" role="status">Opening your saved Career Interest Profile…</div>
+  }
+
   <!-- ══════════════════════════════════════════════
        PHASE HEADER (shown during all question phases)
   ══════════════════════════════════════════════ -->
-  @if (phase() !== 'results') {
+  @if (!restoring() && phase() !== 'results') {
     <div class="shell">
       <div class="assess-header">
-        <a href="/analyze" class="back-link">← Back to Dashboard</a>
+          <a href="/analyze" class="back-link">← Back to Dashboard</a>
         <div class="assess-badge">🧠 Career Interest Assessment</div>
         <h1>Discover your Career Interest Profile</h1>
         <p class="assess-sub">Answer honestly — there are no right or wrong answers. The more truthful you are, the more accurate your career profile will be.</p>
@@ -183,7 +187,7 @@
   <!-- ══════════════════════════════════════════════
        RESULTS PAGE
   ══════════════════════════════════════════════ -->
-  @if (phase() === 'results') {
+  @if (!restoring() && phase() === 'results') {
     @if (result(); as r) {
       <div class="shell">
 
@@ -287,7 +291,7 @@
         <!-- Career suggestions -->
         <div class="careers-section">
           <h3>Careers that may suit your profile</h3>
-          <p class="careers-note">Each match shows why it fits your interest profile. Combine this with your academic results for a fuller picture.</p>
+          <p class="careers-note">These suggestions reflect your stated interests, not your marks or admission eligibility. Explore them with a career guidance professional.</p>
           <div class="match-list">
             @for (m of r.careerMatches; track m.title) {
               <div class="match-item">
@@ -329,7 +333,7 @@
           <div class="combine-icon">🎓</div>
           <div>
             <p class="combine-title">Your profile has been saved</p>
-            <p class="combine-desc">Return to your career analysis to see how this Career Interest Profile combines with your academic results. Together, they give Pathly a much deeper understanding of which careers may truly fit you.</p>
+            <p class="combine-desc">Your detailed interest report is saved. Premium users can generate a separate combined report from their academic dashboard when both an academic report and this assessment are available. This profile alone does not determine admission eligibility.</p>
           </div>
         </div>
 

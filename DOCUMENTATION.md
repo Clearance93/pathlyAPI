@@ -40,10 +40,12 @@ Based on the AI results, PathlyAI produces:
 
 ### 3.3 Subscription plans
 
-Plans shown in the UI:
-- Free plan: limited analyses, preview of results
-- Pro plan: unlimited analyses, full report, strengths, alternative careers, feedback
-- School plan: supports bulk usage, teacher features, and higher student volume
+Plans shown in the UI (three customer-facing tiers):
+- **Free**: the whole app is open, but every report section shows a single sample item
+- **Standard**: the complete academic (student) report — all career matches, demand, outlook, subjects and APS — with no psychometrics
+- **Premium**: everything in Standard plus the Career Interest (psychometric) assessment, every interest dimension, and the combined academic + interest report
+
+Legacy API codes `pro` and `school` are normalised to Premium by `SubscriptionService`.
 
 ### 3.4 Authentication and access control
 
@@ -86,14 +88,16 @@ Authenticated users reach the `/analyze` page.
 ### 4.4 View report
 
 After analysis, users see a results page that changes depending on plan level.
-- free users see a preview and can upgrade
-- Pro/School users see the full report
+- Free users see one sample item in every section and an upgrade prompt
+- Standard users see the full academic report, with psychometrics upsold to Premium
+- Premium users see the psychometric layer and can generate the combined report
 
 ### 4.5 Upgrade path
 
-Users can navigate to the pricing/upgrade flow and submit payment details.
-- payment is currently simulated in the frontend
-- successful payment updates the user plan and grants full access
+Users can navigate to the pricing/upgrade flow and check out through the hosted payment provider.
+- `/upgrade` compares Free, Standard and Premium and links to `/payment?plan=<standard|premium>`
+- `/payment` starts a hosted (Paystack) checkout via `/api/Billing/checkout/{planCode}`
+- the server owns the plan catalogue, prices and entitlements; the frontend only displays them
 
 ## 5. Application Pages and Routes
 
@@ -136,14 +140,17 @@ POPIA Privacy Policy, including self-service "download my data" and "delete my a
 ## 6. Subscription Logic
 
 ### Free plan
-- 2 free analyses stored in localStorage
-- can analyze if free usage is below limit
-- free users see locked results and upgrade prompts
+- full app access; each report section shows one sample item (`previewLimit = 1`)
+- psychometrics are not available to Free (no assessment, no combined report)
+- the combined report is locked
 
-### Pro and School plans
-- unlimited analyses
-- full report access
-- plan state is stored in the user object
+### Standard plan
+- the full academic (student) report: all career matches, demand, outlook, subjects and APS
+- no psychometrics or combined report — `psychometricGuard` redirects these learners to `/upgrade`
+
+### Premium plan
+- everything in Standard plus the Career Interest (psychometric) assessment, all interest dimensions and the combined report
+- legacy `pro`/`school` codes are treated as Premium
 
 ### Tracking
 - the authoritative usage count is stored server-side (billing engine) and exposed via `/api/Billing/usage`
@@ -208,9 +215,10 @@ The academic service handles multiple response shapes and strips markdown fences
 - file input supports PDF and image MIME types
 - large files are rejected above 1.5 MB
 
-### Payment simulation
-- no real payment gateway integration is present in the frontend currently
-- the payment page simulates processing and then updates local storage
+### Payments
+- the frontend never collects card details; it redirects to the hosted Paystack checkout returned by `/api/Billing/checkout/{planCode}`
+- plan prices and entitlements come from the server (`/api/Plans`, `/api/Billing/usage`), so the UI prices are display hints only
+- if the billing API is unavailable the payment page shows a "payments launching soon" state instead of failing
 
 ## 9. Running the Application Locally
 

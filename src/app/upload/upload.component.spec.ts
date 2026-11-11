@@ -73,6 +73,7 @@ describe('UploadComponent', () => {
       currentUser: () => ({ id: userId, email: 'test@example.com', token: 't', expiration: '', plan: 'free' }),
       plan: () => 'free',
       isPro: () => false,
+      updatePlan: vi.fn(),
       logout: vi.fn(),
     };
 
@@ -88,7 +89,17 @@ describe('UploadComponent', () => {
         },
         { provide: AuthService, useValue: mockAuth },
         { provide: PsychometricService, useValue: { getLatest: vi.fn(() => throwError(() => ({ status: 404 }))) } },
-        { provide: SubscriptionService, useValue: { recordUsage: mockRecordUsage, resetUsage: mockResetUsage, isPro: () => false, plan: () => 'free', isLoggedIn: () => true } },
+        { provide: SubscriptionService, useValue: {
+          recordUsage: mockRecordUsage,
+          resetUsage: mockResetUsage,
+          isPro: () => false,
+          isFree: () => true,
+          isStandard: () => false,
+          isPremium: () => false,
+          previewLimit: () => 1,
+          plan: () => 'free',
+          isLoggedIn: () => true
+        } },
         { provide: BillingService, useValue: { getUsage: mockGetUsage } },
       ],
     }).compileComponents();
@@ -115,7 +126,7 @@ describe('UploadComponent', () => {
     expect(component.error()).toBe('');
   });
 
-  it('should clear result and reset state', () => {
+  it('should show the upload form without deleting the last report cache', () => {
     component.result.set(mockResult);
     component.fileName.set('test.pdf');
     component.error.set('test error');
@@ -126,7 +137,30 @@ describe('UploadComponent', () => {
     expect(component.result()).toBeNull();
     expect(component.fileName()).toBe('');
     expect(component.error()).toBe('');
-    expect(sessionStorage.getItem(resultKey)).toBeNull();
+    expect(sessionStorage.getItem(resultKey)).not.toBeNull();
+  });
+
+  it('returns to the cached dashboard report from the upload form', () => {
+    sessionStorage.setItem(resultKey, JSON.stringify(mockResult));
+
+    component.returnToDashboard();
+
+    expect(component.result()?.aiResponseId).toBe(mockResult.aiResponseId);
+  });
+
+  it('blocks file analysis before upload when the monthly allowance is exhausted', () => {
+    component.usage.set({
+      planCode: 'free', planName: 'Free', analysesUsedThisMonth: 5,
+      monthlyAnalysisQuota: 5, psychometricSubmissionsThisMonth: 0,
+      monthlyPsychometricQuota: 0, premiumAnalysisUnlocked: false, creditBalance: 0,
+    });
+    const file = new File(['results'], 'results.pdf', { type: 'application/pdf' });
+
+    component['processFile'](file);
+
+    expect(component.usageLimitReached()).toBe(true);
+    expect(component.error()).toContain('all of your analyses');
+    expect(mockAcademicService).not.toHaveBeenCalled();
   });
 
   it('should set error for file exceeding size limit', () => {
@@ -240,5 +274,25 @@ describe('UploadComponent', () => {
     sessionStorage.setItem('pathly_result_someone-else', JSON.stringify(mockResult));
     const fixture2 = TestBed.createComponent(UploadComponent);
     expect(fixture2.componentInstance.result()).toBeNull();
+  });
+
+  it('free tier previews one item per section and counts what is hidden', () => {
+    component.result.set({
+      ...mockResult,
+      topFiveBestCareers: [
+        { title: 'A', field: 'f', matchPercentage: 90 },
+        { title: 'B', field: 'f', matchPercentage: 80 },
+        { title: 'C', field: 'f', matchPercentage: 70 },
+      ],
+      subjectResults: [
+        { subject: 'Mathematics', grade: 'A', mark: 90 },
+        { subject: 'Physical Sciences', grade: 'B', mark: 80 },
+      ],
+    } as any);
+
+    expect(component.isPreview()).toBe(true);
+    expect(component.visibleBestCareers.length).toBe(1);
+    expect(component.visibleSubjects.length).toBe(1);
+    expect(component.previewLockedCount()).toBe(3); // 2 careers + 1 subject
   });
 });

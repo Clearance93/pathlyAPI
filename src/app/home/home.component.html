@@ -16,7 +16,7 @@
       <a (click)="goToAnalyze()" class="btn-primary" style="cursor:pointer">Discover My Career Path →</a>
       <a href="#how" class="btn-ghost">See How It Works</a>
     </div>
-    <p class="hero-note">✅ Free to start &nbsp;·&nbsp; ✅ No career counsellor needed &nbsp;·&nbsp; ✅ Results in under 60 seconds</p>
+    <p class="hero-note">✅ Free to start &nbsp;·&nbsp; ✅ Explore your options at your own pace</p>
   </div>
 
   <div class="hero-card">
@@ -91,7 +91,7 @@
           <li>✓ Deeper career matching</li>
           <li>✓ Combined AI reasoning</li>
         </ul>
-        <div class="layer-tag coming-soon">Coming Soon</div>
+        <div class="layer-tag available">Available with Premium</div>
       </div>
       <div class="layer-equals">=</div>
       <div class="layer-result">
@@ -104,14 +104,12 @@
 </section>
 
 <!-- STATS -->
-<section class="stats">
-  <div class="stat"><span class="stat-num">10,000+</span><span class="stat-label">Students Guided</span></div>
+<section class="stats" aria-label="Pathly features">
+  <div class="stat"><span class="stat-num">Academic results</span><span class="stat-label">A clearer view of your subjects and marks</span></div>
   <div class="stat-divider"></div>
-  <div class="stat"><span class="stat-num">60s</span><span class="stat-label">Average Analysis Time</span></div>
+  <div class="stat"><span class="stat-num">Career interests</span><span class="stat-label">An optional profile to support exploration</span></div>
   <div class="stat-divider"></div>
-  <div class="stat"><span class="stat-num">95%</span><span class="stat-label">Satisfaction Rate</span></div>
-  <div class="stat-divider"></div>
-  <div class="stat"><span class="stat-num">500+</span><span class="stat-label">Schools Onboarded</span></div>
+  <div class="stat"><span class="stat-num">Your history</span><span class="stat-label">Review progress across saved reports</span></div>
 </section>
 
 <!-- HOW IT WORKS -->
@@ -263,7 +261,7 @@
     <p class="cta-principle-highlight">"Together, they give Pathly a deeper understanding of your potential career pathways."</p>
   </div>
   <a (click)="goToAnalyze()" class="btn-primary large-btn" style="cursor:pointer">Start My Career Analysis — Free →</a>
-  <p class="cta-note">No credit card · No career counsellor · Results in under 60 seconds</p>
+  <p class="cta-note">No credit card required to start. Pathly is a starting point for exploration, not a substitute for a career guidance professional.</p>
 </section>
 
 <!-- FOOTER -->
@@ -272,5 +270,5 @@
     <span>🎓</span>
     <span class="brand-name-footer">PathlyAI</span>
   </div>
-  <p class="footer-copy">© 2025 PathlyAI. Empowering students to find their path.</p>
+  <p class="footer-copy">© {{ currentYear }} PathlyAI. Empowering students to find their path.</p>
 </footer>

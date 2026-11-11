@@ -12,6 +12,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private router = inject(Router);
   carouselIndex = 0;
+  readonly currentYear = new Date().getFullYear();
   private _interval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit() {
@@ -48,14 +49,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   ];
 
   plans: { name: string; price: string; period: string; features: string[]; cta: string; highlight: boolean; plan: string }[] = [
-    { name: 'Free', price: 'R0', period: 'forever', features: ['1 analysis only', 'Top 3 career matches', 'No feedback report'], cta: 'Start Free', highlight: false, plan: 'free' },
-    { name: 'Pro', price: 'R99', period: 'per month', features: ['Unlimited analyses', 'All 5 career matches', 'Detailed AI feedback', 'Strengths & weaknesses', 'Alternative career paths'], cta: 'Go Pro', highlight: true, plan: 'pro' },
-    { name: 'School', price: 'R499', period: 'per month', features: ['Up to 500 students', 'Bulk upload support', 'Teacher dashboard', 'Progress tracking', 'Priority support'], cta: 'Contact Us', highlight: false, plan: 'school' }
+    { name: 'Free', price: 'R0', period: 'forever', features: ['Full app access', '1 sample item per section', 'Academic report preview'], cta: 'Start Free', highlight: false, plan: 'free' },
+    { name: 'Standard', price: 'R49', period: 'per month', features: ['Complete academic report', 'All career matches', 'Subjects, APS and study tips'], cta: 'Choose Standard', highlight: false, plan: 'standard' },
+    { name: 'Premium', price: 'R99', period: 'per month', features: ['Everything in Standard', 'Career Interest assessment', 'Combined academic + interest report'], cta: 'Choose Premium', highlight: true, plan: 'premium' }
   ];
 
   testimonials = [
     { name: 'Thabo M.', grade: 'Grade 12 · Johannesburg', text: 'The full feedback report changed everything. I finally understood why I struggled in certain subjects and what careers would actually suit me.' },
-    { name: 'Lerato K.', grade: 'Grade 11 · Pretoria', text: 'I upgraded to Pro and the alternative careers section showed me options I never even knew existed. Worth every cent.' },
+    { name: 'Lerato K.', grade: 'Grade 11 · Pretoria', text: 'I upgraded to Premium and the alternative careers section showed me options I never even knew existed. Worth every cent.' },
     { name: 'Sipho N.', grade: 'Grade 12 · Durban', text: 'The strengths breakdown helped me convince my parents that engineering was the right path for me. The data spoke for itself.' },
     { name: 'Thapelo Moeketsi', grade: 'Grade 10 · HTS High School, Sasolburg', text: 'I tested PathlyAI with my actual results and it genuinely motivated me to study harder. Seeing my potential laid out like that made me realise I was capable of more than I thought.' },
     { name: 'Amahle D.', grade: 'Grade 11 · Cape Town', text: 'I always thought I was average, but PathlyAI showed me I have a natural strength in sciences. Now I am aiming for medicine and I actually believe I can do it.' },

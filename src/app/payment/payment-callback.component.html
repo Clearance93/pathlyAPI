@@ -1,0 +1,21 @@
+<div class="pay-page">
+  <div class="callback-card">
+    @if (loading()) {
+      <div class="spinner"></div>
+      <h2>Confirming your payment...</h2>
+      <p>Please keep this page open for a moment.</p>
+    } @else if (success()) {
+      <div class="callback-icon success">&#10003;</div>
+      <h2>You're on {{ planName() }}!</h2>
+      <p>Your account has been upgraded. Redirecting you to your analysis...</p>
+    } @else {
+      <div class="callback-icon error">!</div>
+      <h2>Payment not confirmed yet</h2>
+      <p>{{ error() }}</p>
+      <div class="callback-actions">
+        <a routerLink="/upgrade" class="pay-btn">Back to plans</a>
+        <a routerLink="/analyze" class="pay-btn secondary">Go to analysis</a>
+      </div>
+    }
+  </div>
+</div>

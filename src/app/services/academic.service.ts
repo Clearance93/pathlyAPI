@@ -4,6 +4,22 @@ import { Observable, map } from 'rxjs';
 import { AiResponse, AcademicPrediction, AnalysisHistoryResponse, Progression, PsychometricScores } from '../models/ai-response.model';
 import { environment } from '../../environments/environment';
 
+/** South African NSC achievement level, converted to APS points (levels 1–7). */
+export function apsPointsForMark(mark: number): number {
+  if (!Number.isFinite(mark)) return 0;
+  if (mark >= 80) return 7;
+  if (mark >= 70) return 6;
+  if (mark >= 60) return 5;
+  if (mark >= 50) return 4;
+  if (mark >= 40) return 3;
+  if (mark >= 30) return 2;
+  return 1;
+}
+
+export function calculateApsFromMarks(marks: number[]): number {
+  return marks.reduce((total, mark) => total + apsPointsForMark(mark), 0);
+}
+
 @Injectable({ providedIn: 'root' })
 export class AcademicService {
   private http = inject(HttpClient);
@@ -170,32 +186,54 @@ export class AcademicService {
   }
 
   private mapSubjectResults(res: any) {
-    return (res.subjectResults ?? []).map((s: any, i: number) => ({
-      subject: s.subect ?? s.subject ?? `Subject ${i + 1}`,
-      mark: s.mark,
-      grade: s.grade,
-      careerRelevance: s.careerRelevance,
-      improvementTip: s.improvementTip,
-    }));
+    return (res.subjectResults ?? res.SubjectResults ?? []).map((s: any, i: number) => {
+      const rawMark = Number(s.mark ?? s.Mark);
+      const hasValidMark = Number.isFinite(rawMark) && rawMark >= 0 && rawMark <= 100;
+      const mark = Number.isFinite(rawMark) ? rawMark : 0;
+      return {
+        subject: s.subect ?? s.subject ?? s.Subject ?? `Subject ${i + 1}`,
+        mark,
+        apsPoints: s.apsPoints ?? s.ApsPoints ?? null,
+        includedInApsCalculation: s.includedInApsCalculation ?? s.IncludedInApsCalculation ?? null,
+        // Do not use the generated grade/level for APS: it can disagree with the exact mark.
+        grade: hasValidMark ? `Level ${apsPointsForMark(mark)}` : (s.grade ?? s.Grade ?? ''),
+        careerRelevance: s.careerRelevance ?? s.CareerRelevance,
+        improvementTip: s.improvementTip ?? s.ImprovementTip,
+      };
+    });
   }
 
   private mapApsAnalysis(res: any) {
     const aps = res.apsAnalysis;
     if (!aps) return undefined;
 
-    const val = aps.calculatedAps ?? aps.calculatedAPS ?? 0;
-    const subjects: any[] = res.subjectResults ?? [];
-    const derivedAPS = val > 0 ? val : subjects.reduce((sum: number, s: any) => {
-      const mark = s.mark ?? 0;
-      if (mark >= 90) return sum + 7;
-      if (mark >= 80) return sum + 6;
-      if (mark >= 70) return sum + 5;
-      if (mark >= 60) return sum + 4;
-      if (mark >= 50) return sum + 3;
-      if (mark >= 40) return sum + 2;
-      if (mark >= 30) return sum + 1;
-      return sum;
-    }, 0);
+    const val = Number(aps.calculatedAps ?? aps.calculatedAPS ?? 0);
+    const subjects: any[] = res.subjectResults ?? res.SubjectResults ?? [];
+    const hasSourceMarks = subjects.some((s: any) => {
+      const mark = Number(s.mark ?? s.Mark);
+      return Number.isFinite(mark) && mark >= 0 && mark <= 100;
+    });
+    const hasApsBreakdown = subjects.length > 0 && subjects.every((s: any) =>
+      Number.isFinite(Number(s.apsPoints ?? s.ApsPoints)) &&
+      typeof (s.includedInApsCalculation ?? s.IncludedInApsCalculation) === 'boolean'
+    );
+    // New API responses identify excluded subjects explicitly. For older stored reports,
+    // preserve the existing SA rule that Life Orientation is not part of the APS total.
+    const derivedAPS = hasApsBreakdown
+      ? subjects.reduce((total: number, s: any) =>
+          (s.includedInApsCalculation ?? s.IncludedInApsCalculation)
+            ? total + Number(s.apsPoints ?? s.ApsPoints)
+            : total, 0)
+      : hasSourceMarks
+        ? subjects.reduce((total: number, s: any) => {
+            const name = String(s.subject ?? s.Subject ?? s.subect ?? '').toLowerCase().trim();
+            if (name === 'lo' || name.includes('life orientation')) return total;
+            const mark = Number(s.mark ?? s.Mark);
+            return Number.isFinite(mark) && mark >= 0 && mark <= 100
+              ? total + apsPointsForMark(mark)
+              : total;
+          }, 0)
+        : (val > 0 ? val : 0);
 
     const allUnis = [
       ...(aps.universitiesTheyQualifyFor ?? []),

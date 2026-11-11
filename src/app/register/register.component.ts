@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject, sig
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { normalizePlan } from '../services/subscription.service';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -20,11 +21,13 @@ export class RegisterComponent implements AfterViewInit, OnDestroy {
   /** Holds the polling handle used while waiting for the Turnstile script to load. */
   private turnstilePoll: ReturnType<typeof setInterval> | null = null;
 
-  plan = this.route.snapshot.queryParamMap.get('plan') ?? 'pro';
+  /** Normalised tier the visitor chose on the upgrade page. Paid tiers check out after signup. */
+  plan = normalizePlan(this.route.snapshot.queryParamMap.get('plan'));
 
   planLabels: Record<string, { name: string; price: string }> = {
-    pro:    { name: 'Pro',    price: 'R99/month'  },
-    school: { name: 'School', price: 'R499/month' }
+    free:     { name: 'Free',     price: 'R0'         },
+    standard: { name: 'Standard', price: 'R49/month'  },
+    premium:  { name: 'Premium',  price: 'R99/month'  }
   };
 
   form = {
@@ -116,7 +119,15 @@ export class RegisterComponent implements AfterViewInit, OnDestroy {
       this.form.marketingConsent,
       this.captchaToken()
     ).subscribe({
-      next: () => this.router.navigate(['/analyze']),
+      next: () => {
+        // Every account starts on Free. If a paid tier was chosen up front, take the new
+        // account straight to checkout instead of silently dropping them on the free plan.
+        if (this.plan === 'free') {
+          this.router.navigate(['/analyze']);
+        } else {
+          this.router.navigate(['/payment'], { queryParams: { plan: this.plan } });
+        }
+      },
       error: (err) => {
         this.error.set(err?.error?.message ?? 'Registration failed. Please try again.');
         this.loading.set(false);

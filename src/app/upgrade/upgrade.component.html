@@ -1,14 +1,44 @@
 <div class="page">
-  <div class="coming-soon-wrap">
-    <a routerLink="/analyze" class="back-link">← Back</a>
+  <div class="upgrade-wrap">
     <div class="cs-glow"></div>
-    <div class="cs-badge">🚀 Coming Soon</div>
-    <h1>Pro & School Plans<br /><span class="gradient-text">are on their way.</span></h1>
-    <p class="cs-sub">
-      We're putting the finishing touches on our paid plans. For now, enjoy
-      <strong>full free access</strong> — no credit card, no limits.
-    </p>
-    <a routerLink="/analyze" class="cs-btn">Start Analyzing for Free →</a>
-    <p class="cs-note">Paid plans launching soon · We'll let you know first</p>
+    <a [routerLink]="backLink()" class="back-link">← Back</a>
+
+    <div class="upgrade-head">
+      <div class="cs-badge">🎓 Plans</div>
+      <h1>Choose how deep<br /><span class="gradient-text">you want to go.</span></h1>
+      <p class="cs-sub">
+        Start free and preview every section. Upgrade to Standard for the full academic report,
+        or Premium to add psychometrics and the combined report.
+      </p>
+    </div>
+
+    <div class="plan-grid">
+      @for (p of plans; track p.code) {
+        <div class="plan-card" [class.highlight]="p.highlight" [class.current]="isCurrent(p.code)">
+          <div class="plan-top">
+            <span class="plan-name">{{ p.name }}</span>
+            @if (isCurrent(p.code)) { <span class="plan-flag">Current plan</span> }
+            @else if (p.highlight) { <span class="plan-flag">Most complete</span> }
+          </div>
+          <p class="plan-tagline">{{ p.tagline }}</p>
+          <p class="plan-price">{{ p.price }}<span class="plan-period"> / {{ p.period }}</span></p>
+
+          <ul class="plan-features">
+            @for (f of p.features; track f) {
+              <li>{{ f }}</li>
+            }
+          </ul>
+
+          @if (isCurrent(p.code)) {
+            <span class="plan-btn muted">Your current plan</span>
+          } @else {
+            <a class="plan-btn" [class.solid]="p.highlight"
+               [routerLink]="checkoutPath(p.code)" [queryParams]="checkoutQuery(p.code)">{{ p.cta }}</a>
+          }
+        </div>
+      }
+    </div>
+
+    <p class="cs-note">Prices shown in ZAR · Billed monthly · Cancel anytime · Secure checkout via Paystack</p>
   </div>
 </div>

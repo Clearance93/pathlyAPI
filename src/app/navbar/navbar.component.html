@@ -20,7 +20,7 @@
       <button class="nav-logout" (click)="auth.logout(); closeMenu()">Sign Out</button>
     } @else {
       <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Sign In</a>
-      <a routerLink="/register" [queryParams]="{plan:'pro'}" class="nav-cta" (click)="closeMenu()">Get Started Free</a>
+      <a routerLink="/register" [queryParams]="{plan:'free'}" class="nav-cta" (click)="closeMenu()">Get Started Free</a>
     }
   </div>
 </nav>
