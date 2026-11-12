@@ -42,6 +42,13 @@ h1 { text-align: center; font-size: 1.6rem; font-weight: 800; margin-bottom: 0.4
   margin-bottom: 1.75rem;
 }
 
+.login-lockout-note {
+  margin-top: -0.35rem;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
 /* ── SOCIAL BUTTONS ── */
 .social-btns { display: flex; flex-direction: column; gap: 0.75rem; }
 
