@@ -94,8 +94,10 @@ export class PaymentComponent {
         if (res.success && res.authorizationUrl) {
           window.location.href = res.authorizationUrl;
         } else if (res.success) {
-          // No hosted page to open: the plan was already activated (e.g. a free change).
-          this.completeUpgrade(res.planCode ?? this.plan);
+          // A paid plan is only ever granted after Paystack confirms the charge (callback +
+          // server-side verify). A "success" with no payment page is a misbehaving API, so
+          // never show an upgrade the user has not paid for.
+          this.error.set('We could not open the payment page. Please try again in a moment.');
         } else {
           this.paymentsUnavailable.set(true);
         }
