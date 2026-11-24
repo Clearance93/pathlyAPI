@@ -27,6 +27,10 @@ export interface CheckoutResponse {
 export interface BillingConfig {
   paymentsEnabled: boolean;
   devActivationEnabled: boolean;
+  /** Paystack publishable key (safe for the browser); absent when not configured. */
+  publicKey?: string | null;
+  /** True while the API runs on Paystack test keys — no real money moves. */
+  isTestMode?: boolean;
 }
 
 export interface UsageSummary {

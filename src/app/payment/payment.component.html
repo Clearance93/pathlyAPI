@@ -39,6 +39,12 @@
       <!-- Right: Secure checkout -->
       <div class="pay-form-wrap">
         <h2>Secure Checkout</h2>
+        @if (testMode()) {
+          <div class="error-box">
+            &#129514; Test mode — no real money is charged. Use Paystack's test card
+            <strong>4084 0840 8408 4081</strong>, any future expiry, CVV <strong>408</strong>.
+          </div>
+        }
         <p class="pay-sub">You'll complete payment on our secure payment provider's page — we never see or store your card details.</p>
 
         @if (paymentsUnavailable()) {

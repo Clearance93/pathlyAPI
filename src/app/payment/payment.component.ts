@@ -59,6 +59,8 @@ export class PaymentComponent {
   paymentsUnavailable = signal(false);
   /** True when this deployment can activate a plan without the payment provider (dev only). */
   devActivationAvailable = signal(false);
+  /** True when the API is on Paystack test keys, so no real money will be charged. */
+  testMode = signal(false);
 
   constructor() {
     // There is nothing to check out on the free tier.
@@ -71,6 +73,7 @@ export class PaymentComponent {
     this.billing.getConfig().subscribe({
       next: (config) => {
         this.devActivationAvailable.set(environment.allowDevUpgrades && config.devActivationEnabled);
+        this.testMode.set(!!config.isTestMode);
         if (!config.paymentsEnabled) {
           this.paymentsUnavailable.set(true);
         }
@@ -97,9 +100,17 @@ export class PaymentComponent {
           this.paymentsUnavailable.set(true);
         }
       },
-      error: () => {
+      error: (err) => {
         this.loading.set(false);
-        this.paymentsUnavailable.set(true);
+
+        if (err?.status === 401) {
+          // Session expired: send them to log in rather than claiming checkout is down.
+          this.router.navigate(['/login'], { queryParams: { returnUrl: `/payment?plan=${this.plan}` } });
+        } else if (err?.status === 503 || err?.status === 0) {
+          this.paymentsUnavailable.set(true);
+        } else {
+          this.error.set(err?.error?.message ?? 'We could not start the payment. Please try again.');
+        }
       }
     });
   }
