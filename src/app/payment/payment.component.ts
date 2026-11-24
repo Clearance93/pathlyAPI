@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { SubscriptionService, Plan, normalizePlan } from '../services/subscription.service';
 import { BillingService } from '../services/billing.service';
@@ -8,7 +9,7 @@ import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-payment',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './payment.component.html',
   styleUrl: './payment.component.css'
 })
